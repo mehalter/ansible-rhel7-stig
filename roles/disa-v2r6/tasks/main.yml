@@ -1,0 +1,22 @@
+---
+- name: "CAT I | RHEL-07-010010 | The Red Hat Enterprise Linux operating system must be configured so that the file permissions, ownership, and group membership of system files and commands match the vendor values."
+  block:
+    - name: Check for packages with incorrect permissions
+      shell: |
+        ( for i in `rpm -Va --nodeps --nosignature --nofiledigest --nosize --nomtime --nordev --nocaps --nolinkto --nouser --nogroup | egrep -i '^\.[M|U|G|.]{8}' | cut -d " " -f4,5`; do rpm -qf $i;done )
+      args:
+        warn: false
+      register: packages_with_incorrect_permissions
+      failed_when: packages_with_incorrect_permissions.rc > 1
+      changed_when: false
+
+    - name: Correct file ownership and permissions
+      shell: >
+        ( rpm --setugids "{{ item }}"; rpm --setperms "{{ item }}" )
+      args:
+        warn: false
+      with_items: '{{ packages_with_incorrect_permissions.stdout_lines }}'
+      when:
+        - (packages_with_incorrect_permissions.stdout_lines | length > 0)
+  tags:
+      - RHEL-07-010010
