@@ -21,3 +21,26 @@
   tags:
       - CAT-I
       - RHEL-07-010010
+
+- name: "CAT I | RHEL-07-010020 | The Red Hat Enterprise Linux operating system must be configured so that the cryptographic hash of system files and commands matches vendor values."
+  block:
+    - name: Check for packages with incorrect cryptographic integrity
+      shell: |
+        ( for i in `rpm -Va --noconfig --nolinkto --nosize --nouser --nogroup --nomtime --nomode --nodigest --nosignature | egrep -i '^..5' | cut -d " " -f4,5`; do rpm -qf $i;done )
+      args:
+        warn: false
+      register: packages_with_incorrect_crypto
+      failed_when: packages_with_incorrect_crypto.rc > 1
+      changed_when: false
+
+    - name: Correct file ownership and permissions
+      shell: >
+        ( yum reinstall -y {{ item }} )
+      args:
+        warn: false
+      with_items: '{{ packages_with_incorrect_crypto.stdout_lines }}'
+      when:
+        - (packages_with_incorrect_crypto.stdout_lines | length > 0)
+  tags:
+      - CAT-I
+      - RHEL-07-010020
