@@ -10,7 +10,7 @@
       failed_when: packages_with_incorrect_permissions.rc > 1
       changed_when: false
 
-    - name: Correct file ownership and permissions
+    - name: Correct package ownership and permissions
       shell: >
         ( rpm --setugids "{{ item }}"; rpm --setperms "{{ item }}" )
       args:
@@ -33,7 +33,7 @@
       failed_when: packages_with_incorrect_crypto.rc > 1
       changed_when: false
 
-    - name: Correct file ownership and permissions
+    - name: Correct package cryptographic integrity
       shell: >
         ( yum reinstall -y {{ item }} )
       args:
