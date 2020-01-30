@@ -19,4 +19,5 @@
       when:
         - (packages_with_incorrect_permissions.stdout_lines | length > 0)
   tags:
+      - CAT-I
       - RHEL-07-010010
