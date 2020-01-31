@@ -9,9 +9,8 @@
       register: packages_with_incorrect_permissions
       failed_when: packages_with_incorrect_permissions.rc > 1
       changed_when: false
-
     - name: Correct package ownership and permissions
-      shell: >
+      shell: |
         ( rpm --setugids "{{ item }}"; rpm --setperms "{{ item }}" )
       args:
         warn: false
@@ -32,9 +31,8 @@
       register: packages_with_incorrect_crypto
       failed_when: packages_with_incorrect_crypto.rc > 1
       changed_when: false
-
     - name: Correct package cryptographic integrity
-      shell: >
+      shell: |
         ( yum reinstall -y {{ item }} )
       args:
         warn: false
@@ -44,3 +42,115 @@
   tags:
       - CAT-I
       - RHEL-07-010020
+
+- name: "CAT II | RHEL-07-010030 | The Red Hat Enterprise Linux operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
+  block:
+    - name: Check if the DoD banner is shown with a graphical logon
+      shell: |
+        if rpm -qa|grep -qs gnome; then
+          currstatus=$(sed -n -r "/^\s*\[org\/gnome\/login-screen\]\s*$/,/^\s*\[/ s/^\s*banner-message-enable\s*=\s*(.*)$/\1/p" /etc/dconf/db/local.d/01-banner-message)
+          if [[ "${currstatus}" == "true" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
+        else
+          exit 0
+        fi
+      args:
+        warn: false
+      register: gui_banner_enable_check
+      failed_when: gui_banner_enable_check.rc > 1
+      changed_when: false
+    - name: Enable banner on graphical logon
+      shell: |
+        filename="/etc/dconf/db/local.d/01-banner-message"
+        section="\[org\/gnome\/login-screen\]"
+        regsection="[org/gnome/login-screen]"
+        varname="banner-message-enable"
+        if [[ ! -f $filename ]] || sed -n "/^\s*${section}\s*$/q 1" $filename; then
+            echo $regsection >> $filename
+        fi
+        sed -n -r "/^\s*${section}\s*$/,/^\s*\[/{/^\s*${varname}/q 10}" $filename
+        if [[ $? -eq 10 ]]; then
+            sed -in -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1true/" $filename
+        else
+            sed -in "/^\s*${section}\s*$/a ${varname}=true" $filename
+        fi
+      args:
+        warn: false
+      when:
+        - (gui_banner_enable_check.rc > 0)
+  tags:
+      - CAT-II
+      - RHEL-07-010030
+
+- name: "CAT II | RHEL-07-010040 | The Red Hat Enterprise Linux operating system must display the approved Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a graphical user logon."
+  block:
+    - name: Check for the correct DoD banner
+      shell: |
+        regcorrectstatus="'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n-At any time, the USG may inspect and seize data stored on this IS.\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details. '"
+        if rpm -qa|grep -qs gnome; then
+          currstatus=$(sed -n -r "/^\s*\[org\/gnome\/login-screen\]\s*$/,/^\s*\[/ s/^\s*banner-message-text\s*=\s*(.*)$/\1/p" /etc/dconf/db/local.d/01-banner-message)
+          if [[ "${currstatus}" == "${regcorrectstatus}" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
+        else
+          exit 0
+        fi
+      args:
+        warn: false
+      register: gui_banner_correct_check
+      failed_when: gui_banner_correct_check.rc > 1
+      changed_when: false
+    - name: Correct banner text on graphical logon
+      shell: |
+        filename="/etc/dconf/db/local.d/01-banner-message"
+        section="\[org\/gnome\/login-screen\]"
+        regsection="[org/gnome/login-screen]"
+        varname="banner-message-text"
+        correctstatus="\'You are accessing a U\.S\. Government \(USG\) Information System \(IS\) that is provided for USG-authorized use only\.\\\nBy using this IS \(which includes any device attached to this IS\), you consent to the following conditions:\\\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct \(PM\), law enforcement \(LE\), and counterintelligence \(CI\) investigations\.\\\n-At any time, the USG may inspect and seize data stored on this IS\.\\\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose\.\\\n-This IS includes security measures (e\.g\., authentication and access controls) to protect USG interests--not for your personal benefit or privacy\.\\\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants\. Such communications and work product are private and confidential\. See User Agreement for details\. \'"
+        if [[ ! -f $filename ]] || sed -n "/^\s*${section}\s*$/q 1" $filename; then
+          echo "${regsection}" >> $filename
+        fi
+        sed -n -r "/^\s*${section}\s*$/,/^\s*\[/{/^\s*${varname}/q 10}" $filename
+        if [[ $? -eq 10 ]]; then
+          sed -in -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1${correctstatus}/" $filename
+        else
+          sed -in "/^\s*${section}\s*$/a ${varname}=${correctstatus}" $filename
+        fi
+      args:
+        warn: false
+      when:
+        - (gui_banner_correct_check.rc > 0)
+  tags:
+      - CAT-II
+      - RHEL-07-010040
+
+- name: "CAT II | RHEL-07-010050 | The Red Hat Enterprise Linux operating system must display the Standard Mandatory DoD Notice and Consent Banner before granting local or remote access to the system via a command line user logon."
+  block:
+    - name: Check for DoD banner for console logon
+      shell: |
+        correctstatus=$(echo -e "You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n\n-At any time, the USG may inspect and seize data stored on this IS.\n\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.")
+        if [[ $correctstatus == $(cat /etc/issue) ]]; then
+          exit 0
+        else
+          exit 1
+        fi
+      args:
+        warn: false
+      register: console_banner_check
+      failed_when: console_banner_check.rc > 1
+      changed_when: false
+    - name: Correct console logon banner
+      shell: |
+        echo -e "You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n\n-At any time, the USG may inspect and seize data stored on this IS.\n\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details." > /etc/issue
+      args:
+        warn: false
+      when:
+        - (console_banner_check.rc > 0)
+  tags:
+      - CAT-II
+      - RHEL-07-010050
