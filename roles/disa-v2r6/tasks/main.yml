@@ -153,6 +153,9 @@
         warn: false
       when:
         - (console_banner_check.rc > 0)
+ tags:
+     - CAT-II
+     - RHEL-07-010050
 
 - name: "CAT II | RHEL-07-010060 | The Red Hat Enterprise Linux operating system must enable a user session lock until that user re-establishes access using established identification and authentication procedures."
   block:
@@ -194,6 +197,9 @@
       register: testing
       when:
         - (gui_lock_enable_check.rc > 0)
+ tags:
+     - CAT-II
+     - RHEL-07-010060
 
 - name: "CAT II | RHEL-07-010061 | The Red Hat Enterprise Linux operating system must uniquely identify and must authenticate users using multifactor authentication via a graphical user logon."
   block:
@@ -234,6 +240,119 @@
         warn: false
       when:
         - (smartcard_enable_check.rc > 0)
+ tags:
+     - CAT-II
+     - RHEL-07-010061
+
+- name: "CAT II | RHEL-07-010062 | The Red Hat Enterprise Linux operating system must prevent a user from overriding the screensaver lock-enabled setting for the graphical user interface."
+  block:
+    - name: Check for prevention of overriding lock setting
+      shell: |
+        if rpm -qa|grep -qs gnome; then
+          grep -qsi "/org/gnome/desktop/screensaver/lock-enabled" /etc/dconf/db/local.d/locks/*
+        fi
+      args:
+        warn: false
+      register: lock_override_check
+      failed_when: lock_override_check.rc > 2
+      changed_when: false
+    - name: Correct lock override prevention
+      shell: |
+        echo "/org/gnome/desktop/screensaver/lock-enabled" >> /etc/dconf/db/local.d/locks/session
+      args:
+        warn: false
+      when:
+        - (lock_override_check.rc > 0)
   tags:
       - CAT-II
-      - RHEL-07-010061
+      - RHEL-07-010062
+
+- name: "CAT II | RHEL-07-010070 | The Red Hat Enterprise Linux operating system must initiate a screensaver after a 15-minute period of inactivity for graphical user interfaces."
+  block:
+    - name: Check for screensaver timeout
+      shell: |
+        if rpm -qa|grep -qs gnome; then
+          currstatus=$(sed -n -r "/^\s*\[org\/gnome\/desktop\/session\]\s*$/,/^\s*\[/ s/^\s*idle-delay\s*=\s*(.*)$/\1/p" /etc/dconf/db/local.d/00-screensaver)
+          if [[ "${currstatus}" == "uint32 900" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
+        else
+          exit 0
+        fi
+      args:
+        warn: false
+      register: screensaver_timeout_check
+      failed_when: screensaver_timeout_check.rc > 1
+      changed_when: false
+    - name: Correct screensaver timeout
+      shell: |
+        filename="/etc/dconf/db/local.d/00-screensaver"
+        section="\[org\/gnome\/desktop\/session\]"
+        regsection="[org/gnome/desktop/session]"
+        varname="idle-delay"
+        status="uint32 900"
+        if [[ ! -f $filename ]] || sed -n "/^\s*${section}\s*$/q 1" $filename; then
+            echo $regsection >> $filename
+        fi
+        sed -n -r "/^\s*${section}\s*$/,/^\s*\[/{/^\s*${varname}/q 10}" $filename
+        if [[ $? -eq 10 ]]; then
+            sed -i -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1${status}/" $filename
+        else
+            sed -i "/^\s*${section}\s*$/a ${varname}=${status}" $filename
+        fi
+        dconf update
+      args:
+        warn: false
+      when:
+        - (screensaver_timeout_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010070
+
+- name: "CAT II | RHEL-07-010081 | The Red Hat Enterprise Linux operating system must prevent a user from overriding the screensaver lock-delay setting for the graphical user interface."
+  block:
+    - name: Check for prevention of overriding timeout setting
+      shell: |
+        if rpm -qa|grep -qs gnome; then
+          grep -qsi "/org/gnome/desktop/screensaver/lock-delay" /etc/dconf/db/local.d/locks/*
+        fi
+      args:
+        warn: false
+      register: timeout_override_check
+      failed_when: timeout_override_check.rc > 2
+      changed_when: false
+    - name: Correct timeout override prevention
+      shell: |
+        echo "/org/gnome/desktop/screensaver/lock-delay" >> /etc/dconf/db/local.d/locks/session
+      args:
+        warn: false
+      when:
+        - (timeout_override_check.rc > 0)
+  tags:
+      - CAT-II
+      - RHEL-07-010081
+
+- name: "CAT II | RHEL-07-010082 | The Red Hat Enterprise Linux operating system must prevent a user from overriding the session idle-delay setting for the graphical user interface."
+  block:
+    - name: Check for prevention of overriding idle setting
+      shell: |
+        if rpm -qa|grep -qs gnome; then
+          grep -qsi "/org/gnome/desktop/session/idle-delay" /etc/dconf/db/local.d/locks/*
+        fi
+      args:
+        warn: false
+      register: idle_override_check
+      failed_when: idle_override_check.rc > 2
+      changed_when: false
+    - name: Correct timeout override prevention
+      shell: |
+        echo "/org/gnome/desktop/session/idle-delay" >> /etc/dconf/db/local.d/locks/session
+      args:
+        warn: false
+      when:
+        - (idle_override_check.rc > 0)
+  tags:
+      - CAT-II
+      - RHEL-07-010082
