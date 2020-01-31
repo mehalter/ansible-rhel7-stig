@@ -89,7 +89,7 @@
   block:
     - name: Check for the correct DoD banner
       shell: |
-        regcorrectstatus="'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n-At any time, the USG may inspect and seize data stored on this IS.\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details. '"
+        regcorrectstatus="'{{ logon_banner | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', '') }}'"
         if rpm -qa|grep -qs gnome; then
           currstatus=$(sed -n -r "/^\s*\[org\/gnome\/login-screen\]\s*$/,/^\s*\[/ s/^\s*banner-message-text\s*=\s*(.*)$/\1/p" /etc/dconf/db/local.d/01-banner-message)
           if [[ "${currstatus}" == "${regcorrectstatus}" ]]; then
@@ -105,13 +105,14 @@
       register: gui_banner_correct_check
       failed_when: gui_banner_correct_check.rc > 1
       changed_when: false
+
     - name: Correct banner text on graphical logon
       shell: |
         filename="/etc/dconf/db/local.d/01-banner-message"
         section="\[org\/gnome\/login-screen\]"
         regsection="[org/gnome/login-screen]"
         varname="banner-message-text"
-        correctstatus="\'You are accessing a U\.S\. Government \(USG\) Information System \(IS\) that is provided for USG-authorized use only\.\\\nBy using this IS \(which includes any device attached to this IS\), you consent to the following conditions:\\\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct \(PM\), law enforcement \(LE\), and counterintelligence \(CI\) investigations\.\\\n-At any time, the USG may inspect and seize data stored on this IS\.\\\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose\.\\\n-This IS includes security measures (e\.g\., authentication and access controls) to protect USG interests--not for your personal benefit or privacy\.\\\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants\. Such communications and work product are private and confidential\. See User Agreement for details\. \'"
+        correctstatus="'{{ logon_banner | regex_replace('(?s)(?<!\\n)\\n(?!(\n|$))', '') | regex_replace('(\(|\)|\.)', '\\\1') | regex_replace('(\\n)', '\\\\\1') }}'"
         if [[ ! -f $filename ]] || sed -n "/^\s*${section}\s*$/q 1" $filename; then
           echo "${regsection}" >> $filename
         fi
@@ -133,7 +134,7 @@
   block:
     - name: Check for DoD banner for console logon
       shell: |
-        correctstatus=$(echo -e "You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n\n-At any time, the USG may inspect and seize data stored on this IS.\n\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.")
+        correctstatus=$(echo -e "{{ logon_banner }}")
         if [[ $correctstatus == $(cat /etc/issue) ]]; then
           exit 0
         else
@@ -146,7 +147,7 @@
       changed_when: false
     - name: Correct console logon banner
       shell: |
-        echo -e "You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n\n-At any time, the USG may inspect and seize data stored on this IS.\n\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details." > /etc/issue
+        echo -e "{{ logon_banner }}" > /etc/issue
       args:
         warn: false
       when:
