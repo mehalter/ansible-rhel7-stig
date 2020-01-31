@@ -36,6 +36,8 @@
         ( yum reinstall -y {{ item }} )
       args:
         warn: false
+      register: package_fix_crypto
+      failed_when: package_fix_crypto.rc > 1
       with_items: '{{ packages_with_incorrect_crypto.stdout_lines }}'
       when:
         - (packages_with_incorrect_crypto.stdout_lines | length > 0)
@@ -73,9 +75,9 @@
         fi
         sed -n -r "/^\s*${section}\s*$/,/^\s*\[/{/^\s*${varname}/q 10}" $filename
         if [[ $? -eq 10 ]]; then
-            sed -in -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1true/" $filename
+            sed -i -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1true/" $filename
         else
-            sed -in "/^\s*${section}\s*$/a ${varname}=true" $filename
+            sed -i "/^\s*${section}\s*$/a ${varname}=true" $filename
         fi
       args:
         warn: false
@@ -105,7 +107,6 @@
       register: gui_banner_correct_check
       failed_when: gui_banner_correct_check.rc > 1
       changed_when: false
-
     - name: Correct banner text on graphical logon
       shell: |
         filename="/etc/dconf/db/local.d/01-banner-message"
@@ -118,9 +119,9 @@
         fi
         sed -n -r "/^\s*${section}\s*$/,/^\s*\[/{/^\s*${varname}/q 10}" $filename
         if [[ $? -eq 10 ]]; then
-          sed -in -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1${correctstatus}/" $filename
+          sed -i -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1${correctstatus}/" $filename
         else
-          sed -in "/^\s*${section}\s*$/a ${varname}=${correctstatus}" $filename
+          sed -i "/^\s*${section}\s*$/a ${varname}=${correctstatus}" $filename
         fi
       args:
         warn: false
@@ -152,6 +153,87 @@
         warn: false
       when:
         - (console_banner_check.rc > 0)
+
+- name: "CAT II | RHEL-07-010060 | The Red Hat Enterprise Linux operating system must enable a user session lock until that user re-establishes access using established identification and authentication procedures."
+  block:
+    - name: Check for session lock
+      shell: |
+        if rpm -qa|grep -qs gnome; then
+          currstatus=$(sed -n -r "/^\s*\[org\/gnome\/desktop\/screensaver\]\s*$/,/^\s*\[/ s/^\s*lock-enabled\s*=\s*(.*)$/\1/p" /etc/dconf/db/local.d/00-screensaver)
+          if [[ "${currstatus}" == "true" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
+        else
+          exit 0
+        fi
+      args:
+        warn: false
+      register: gui_lock_enable_check
+      failed_when: gui_lock_enable_check.rc > 1
+      changed_when: false
+    - name: Correct session lock
+      shell: |
+        filename="/etc/dconf/db/local.d/00-screensaver"
+        section="\[org\/gnome\/desktop\/screensaver\]"
+        regsection="[org/gnome/desktop/screensaver]"
+        varname="lock-enabled"
+        if [[ ! -f $filename ]] || sed -n "/^\s*${section}\s*$/q 1" $filename; then
+            echo $regsection >> $filename
+        fi
+        sed -n -r "/^\s*${section}\s*$/,/^\s*\[/{/^\s*${varname}/q 10}" $filename
+        if [[ $? -eq 10 ]]; then
+            sed -i -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1true/" $filename
+        else
+            sed -i "/^\s*${section}\s*$/a ${varname}=true" $filename
+        fi
+        # dconf update
+      args:
+        warn: false
+      register: testing
+      when:
+        - (gui_lock_enable_check.rc > 0)
+
+- name: "CAT II | RHEL-07-010061 | The Red Hat Enterprise Linux operating system must uniquely identify and must authenticate users using multifactor authentication via a graphical user logon."
+  block:
+    - name: Check for smartcard login
+      shell: |
+        if rpm -qa|grep -qs gnome; then
+          currstatus=$(sed -n -r "/^\s*\[org\/gnome\/login-screen\]\s*$/,/^\s*\[/ s/^\s*enable-smartcard-authentication\s*=\s*(.*)$/\1/p" /etc/dconf/db/local.d/00-defaults)
+          if [[ "${currstatus}" == "true" ]]; then
+            exit 0
+          else
+            exit 1
+          fi
+        else
+          exit 0
+        fi
+      args:
+        warn: false
+      register: smartcard_enable_check
+      failed_when: smartcard_enable_check.rc > 1
+      changed_when: false
+    - name: Correct smartcard login
+      shell: |
+        filename="/etc/dconf/db/local.d/00-defaults"
+        section="\[org\/gnome\/login-screen\]"
+        regsection="[org/gnome/login-screen]"
+        varname="enable-smartcard-authentication"
+        if [[ ! -f $filename ]] || sed -n "/^\s*${section}\s*$/q 1" $filename; then
+            echo $regsection >> $filename
+        fi
+        sed -n -r "/^\s*${section}\s*$/,/^\s*\[/{/^\s*${varname}/q 10}" $filename
+        if [[ $? -eq 10 ]]; then
+            sed -i -r "/^\s*${section}\s*$/,/^\s*\[/ s/^(\s*${varname}\s*=\s*).*$/\1true/" $filename
+        else
+            sed -i "/^\s*${section}\s*$/a ${varname}=true" $filename
+        fi
+        dconf update
+      args:
+        warn: false
+      when:
+        - (smartcard_enable_check.rc > 0)
   tags:
       - CAT-II
-      - RHEL-07-010050
+      - RHEL-07-010061
