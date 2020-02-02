@@ -481,3 +481,265 @@
   tags:
     - CAT-II
     - RHEL-07-010110
+
+- name: "CAT II | RHEL-07-010118 | The Red Hat Enterprise Linux operating system must be configured so that /etc/pam.d/passwd implements /etc/pam.d/system-auth when changing passwords."
+  block:
+    - name: Check for system-auth on password change
+      shell: |
+        grep -qs "^password\s\+substack\s\+system-auth" /etc/pam.d/passwd
+      args:
+        warn: false
+      register: system_auth_passwd_check
+      failed_when: system_auth_passwd_check.rc > 1
+      changed_when: false
+    - name: Correct system-auth on password change
+      shell: |
+        echo "password substack system-auth" >> /etc/pam.d/passwd
+      args:
+        warn: false
+      when:
+        - (system_auth_passwd_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010118
+
+- name: "CAT II | RHEL-07-010119 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed or new passwords are established, pwquality must be used."
+  block:
+    - name: Check for password quality
+      shell: |
+        grep -qs "^password required pam_pwquality.so retry=3" /etc/pam.d/passwd
+      args:
+        warn: false
+      register: pam_pwquality_check
+      failed_when: pam_pwquality_check.rc > 1
+      changed_when: false
+    - name: Correct system-auth password quality
+      shell: |
+        if grep -qs pwquality /etc/pam.d/passwd; then
+          sed -in 's/password\s\+required\s\+pam_pwquality.so\s\+retry=.*/password required pam_pwquality.so retry=3/' /etc/pam.d/passwd
+        else
+          echo "password required pam_pwquality.so retry=3" >> /etc/pam.d/passwd
+        fi
+      args:
+        warn: false
+      when:
+        - (pam_pwquality_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010119
+
+- name: "CAT II | RHEL-07-010120 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed or new passwords are established, the new password must contain at least one upper-case character."
+  block:
+    - name: Check for upper case password requirement
+      shell: |
+        grep -qs "^ucredit = -1" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_upper_case_check
+      failed_when: pwquality_upper_case_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality upper case requirement
+      shell: |
+        rule="ucredit"
+        correct="-1"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_upper_case_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010120
+
+- name: "CAT II | RHEL-07-010130 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed or new passwords are established, the new password must contain at least one lower-case character."
+  block:
+    - name: Check for lower case password requirement
+      shell: |
+        grep -qs "^lcredit = -1" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_lower_case_check
+      failed_when: pwquality_lower_case_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality lower case requirement
+      shell: |
+        rule="lcredit"
+        correct="-1"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_lower_case_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010130
+
+- name: "CAT II | RHEL-07-010140 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed or new passwords are assigned, the new password must contain at least one numeric character."
+  block:
+    - name: Check for numeric password requirement
+      shell: |
+        grep -qs "^dcredit = -1" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_numeric_check
+      failed_when: pwquality_numeric_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality numeric requirement
+      shell: |
+        rule="dcredit"
+        correct="-1"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_numeric_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010140
+
+- name: "CAT II | RHEL-07-010150 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed or new passwords are established, the new password must contain at least one special character."
+  block:
+    - name: Check for special character password requirement
+      shell: |
+        grep -qs "^ocredit = -1" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_special_check
+      failed_when: pwquality_special_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality special character requirement
+      shell: |
+        rule="ocredit"
+        correct="-1"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_special_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010150
+
+- name: "CAT II | RHEL-07-010160 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed a minimum of eight of the total number of characters must be changed."
+  block:
+    - name: Check for password length requirement
+      shell: |
+        grep -qs "^difok = 8" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_length_check
+      failed_when: pwquality_length_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality length requirement
+      shell: |
+        rule="difok"
+        correct="8"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_length_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010160
+
+- name: "CAT II | RHEL-07-010170 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed a minimum of four character classes must be changed."
+  block:
+    - name: Check for password change requirement
+      shell: |
+        grep -qs "^minclass = 4" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_change_check
+      failed_when: pwquality_change_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality change requirement
+      shell: |
+        rule="minclass"
+        correct="4"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_change_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010170
+
+- name: "CAT II | RHEL-07-010180 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed the number of repeating consecutive characters must not be more than three characters."
+  block:
+    - name: Check for password character repeat requirement
+      shell: |
+        grep -qs "^maxrepeat = 3" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_repeat_check
+      failed_when: pwquality_repeat_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality character repeat requirement
+      shell: |
+        rule="maxrepeat"
+        correct="3"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_repeat_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010180
+
+- name: "CAT II | RHEL-07-010190 | The Red Hat Enterprise Linux operating system must be configured so that when passwords are changed the number of repeating characters of the same character class must not be more than four characters."
+  block:
+    - name: Check for password character class repeat requirement
+      shell: |
+        grep -qs "^maxclassrepeat = 4" /etc/security/pwquality.conf
+      args:
+        warn: false
+      register: pwquality_class_repeat_check
+      failed_when: pwquality_class_repeat_check.rc > 1
+      changed_when: false
+    - name: Correct pwquality character repeat requirement
+      shell: |
+        rule="maxclassrepeat"
+        correct="4"
+        if grep -qs "^${rule}" /etc/security/pwquality.conf; then
+          sed -in "s/^${rule} = .*/${rule} = ${correct}/" /etc/security/pwquality.conf
+        else
+          echo "${rule} = ${correct}" >> /etc/security/pwquality.conf
+        fi
+      args:
+        warn: false
+      when:
+        - (pwquality_class_repeat_check.rc > 0)
+  tags:
+    - CAT-II
+    - RHEL-07-010190
