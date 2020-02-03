@@ -743,3 +743,106 @@
   tags:
     - CAT-II
     - RHEL-07-010190
+
+- name: "CAT II | RHEL-07-010200 | The Red Hat Enterprise Linux operating system must be configured so that the PAM system service is configured to store only encrypted representations of passwords."
+  block:
+    - name: Check PAM to only store encrypted representations of passwords
+      pamd:
+        name: "{{ item[0] }}"
+        state: "{{ item[1].state }}"
+        type: password
+        control: sufficient
+        module_path: pam_unix.so
+        module_arguments: "{{ item[1].args }}"
+      with_nested:
+        - [ 'system-auth', 'password-auth' ]
+        -
+          - state: args_present
+            args:
+              - "sha512"
+          - state: args_absent
+            args:
+              - "md5"
+              - "bigcrypt"
+              - "sha256"
+              - "blowfish"
+  tags:
+    - CAT-II
+    - RHEL-07-010200
+
+- name: "CAT II | RHEL-07-010210 | The Red Hat Enterprise Linux operating system must be configured to use the shadow file to store only encrypted representations of passwords."
+  block:
+    - name: Check shadow file to only store encrypted representations of passwords
+      lineinfile:
+        dest: /etc/login.defs
+        regexp: ^#?ENCRYPT_METHOD
+        line: "ENCRYPT_METHOD {{ rhel7stig_login_defaults.encrypt_method | default('SHA512') }}"
+  tags:
+    - CAT-II
+    - RHEL-07-010210
+
+- name: "CAT II | RHEL-07-010220 | The Red Hat Enterprise Linux operating system must be configured so that user and group account administration utilities are configured to store only encrypted representations of passwords."
+  block:
+    - name: Check libuser.conf to only store encrypted representations of passwords
+      lineinfile:
+        dest: /etc/libuser.conf
+        regexp: ^#?crypt_style
+        line: crypt_style = sha512
+  tags:
+    - CAT-II
+    - RHEL-07-010220
+
+- name: "CAT II | RHEL-07-010230 | The Red Hat Enterprise Linux operating system must be configured so that passwords for new users are restricted to a 24 hours/1 day minimum lifetime."
+  block:
+    - name: Check minimum password lifetime
+      lineinfile:
+        create: yes
+        dest: /etc/login.defs
+        regexp: ^#?PASS_MIN_DAYS
+        line: "PASS_MIN_DAYS {{ rhel7stig_login_defaults.pass_min_days | default('1') }}"
+  tags:
+    - CAT-II
+    - RHEL-07-010230
+
+- name: "CAT II | RHEL-07-010240 | The Red Hat Enterprise Linux operating system must be configured so that passwords are restricted to a 24 hours/1 day minimum lifetime."
+  block:
+    - name: Check minimum password lifetime for accounts
+      command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $4 < 1 {print $1}' /etc/shadow"
+      check_mode: no
+      changed_when: no
+      register: minimum_password_life_check
+    - name: Fix minimum password lifetime for accounts
+      command: chage -m 1 {{ item }}
+      with_items: "{{ minimum_password_life_check.stdout_lines }}"
+  tags:
+    - CAT-II
+    - RHEL-07-010240
+
+- name: "CAT II | RHEL-07-010250 | The Red Hat Enterprise Linux operating system must be configured so that passwords for new users are restricted to a 60-day maximum lifetime."
+  block:
+    - name: Check maximum password lifetime
+      lineinfile:
+        create: yes
+        dest: /etc/login.defs
+        regexp: ^#?PASS_MAX_DAYS
+        line: "PASS_MAX_DAYS {{ rhel7stig_login_defaults.pass_max_days | default('60') }}"
+  tags:
+    - CAT-II
+    - RHEL-07-010250
+
+- name: "CAT II | RHEL-07-010260 | The Red Hat Enterprise Linux operating system must be configured so that existing passwords are restricted to a 60-day maximum lifetime."
+  block:
+    - name: Check maximum password lifetime for accounts
+      command: "awk -F: '$1 !~ /^root$/ && $2 !~ /^[!*]/ && $5 > 60 {print $1}' /etc/shadow"
+      check_mode: no
+      changed_when: maximum_password_life_check.stdout != ""
+      register: maximum_password_life_check
+    - name: Reset password to prevent locking users out
+      command: chage -d '-1 day' {{ item }}
+      with_items: "{{ maximum_password_life_check.stdout_lines }}"
+    - name: Fix maximum password lifetime for accounts
+      command: chage -M 60 {{ item }}
+      with_items: "{{ maximum_password_life_check.stdout_lines }}"
+  tags:
+    - CAT-II
+    - RHEL-07-010260
