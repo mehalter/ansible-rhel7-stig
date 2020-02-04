@@ -776,7 +776,7 @@
       lineinfile:
         dest: /etc/login.defs
         regexp: ^#?ENCRYPT_METHOD
-        line: "ENCRYPT_METHOD {{ rhel7stig_login_defaults.encrypt_method | default('SHA512') }}"
+        line: "ENCRYPT_METHOD SHA512"
   tags:
     - CAT-II
     - RHEL-07-010210
@@ -799,7 +799,7 @@
         create: yes
         dest: /etc/login.defs
         regexp: ^#?PASS_MIN_DAYS
-        line: "PASS_MIN_DAYS {{ rhel7stig_login_defaults.pass_min_days | default('1') }}"
+        line: "PASS_MIN_DAYS 1"
   tags:
     - CAT-II
     - RHEL-07-010230
@@ -825,7 +825,7 @@
         create: yes
         dest: /etc/login.defs
         regexp: ^#?PASS_MAX_DAYS
-        line: "PASS_MAX_DAYS {{ rhel7stig_login_defaults.pass_max_days | default('60') }}"
+        line: "PASS_MAX_DAYS 60"
   tags:
     - CAT-II
     - RHEL-07-010250
@@ -846,3 +846,95 @@
   tags:
     - CAT-II
     - RHEL-07-010260
+
+- name: "CAT II | RHEL-07-010270 | The Red Hat Enterprise Linux operating system must be configured so that passwords are prohibited from reuse for a minimum of five generations."
+  block:
+    - name: Ensure pam_pwhistory rule exists
+      pamd:
+        name: "{{ item }}"
+        state: before
+        type: password
+        control: sufficient
+        module_path: pam_unix.so
+        new_type: password
+        new_control: requisite
+        new_module_path: pam_pwhistory.so
+      with_items:
+        - "system-auth"
+        - "password-auth"
+    - name: Check for existing password history reuse settings
+      command: "grep -iE '^password\\s+requisite\\s+pam_pwhistory.so\\s+use_authtok\\s+remember=5\\s+retry=3$' /etc/pam.d/{{ item }}"
+      check_mode: no
+      changed_when: no
+      failed_when: password_history_check.rc > 1
+      register: password_history_check
+      with_items:
+        - "system-auth"
+        - "password-auth"
+    - name: Fix password history reuse settings
+      pamd:
+        name: "{{ item.item }}"
+        state: updated
+        type: password
+        control: requisite
+        module_path: pam_pwhistory.so
+        module_arguments:
+          - use_authtok
+          - remember=5
+          - retry=3
+      with_items: "{{ password_history_check.results }}"
+      when: item.rc == 1
+  tags:
+    - CAT-II
+    - RHEL-07-010270
+
+- name: "CAT II | RHEL-07-010280 | The Red Hat Enterprise Linux operating system must be configured so that passwords are a minimum of 15 characters in length."
+  block:
+    - name: check and fix pwquality minimum password length
+      lineinfile:
+        create: yes
+        dest: /etc/security/pwquality.conf
+        regexp: '^#?\s*minlen'
+        line: "minlen = 15"
+  tags:
+    - CAT-II
+    - RHEL-07-010280
+
+- name: "CAT I | RHEL-07-010290 | The Red Hat Enterprise Linux operating system must not have accounts configured with blank or null passwords."
+  block:
+    - name: check for the possibility of null or blank passwords
+      replace:
+        dest: "{{ item }}"
+        follow: true
+        regexp: 'nullok ?'
+      with_items:
+        - /etc/pam.d/system-auth
+        - /etc/pam.d/password-auth
+  tags:
+    - CAT-I
+    - RHEL-07-010290
+
+- name: "CAT I | RHEL-07-010300 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon does not allow authentication using an empty password."
+  block:
+    - name: check for the possibility ssh with null or blank passwords
+      lineinfile:
+        state: present
+        dest: /etc/ssh/sshd_config
+        regexp: "(?i)^#?PermitEmptyPasswords"
+        line: PermitEmptyPasswords no
+        validate: /usr/sbin/sshd -tf %s
+      notify: restart sshd
+  tags:
+    - CAT-I
+    - RHEL-07-010300
+
+- name: "CAT II | RHEL-07-010310 | The Red Hat Enterprise Linux operating system must disable account identifiers (individuals, groups, roles, and devices) if the password expires."
+  block:
+    - name: check for inactivation of user after password expires
+      lineinfile:
+        dest: /etc/default/useradd
+        regexp: ^#?INACTIVE
+        line: INACTIVE=0
+  tags:
+    - CAT-II
+    - RHEL-07-010310
