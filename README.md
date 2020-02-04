@@ -2,3 +2,5 @@
 
 This is a work in progress of an Ansible playbook that will audit and harden
 RHEL7 to the DoD STIG v2r6.
+
+This is heavily based on the [MindPointGroup/RHEL7-STIG](https://github.com/MindPointGroup/RHEL7-STIG) Ansible role
