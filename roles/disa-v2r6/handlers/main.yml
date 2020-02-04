@@ -5,3 +5,6 @@
       state: restarted
   when:
     - ssh_present
+
+- name: make grub2 config
+  command: /usr/sbin/grub2-mkconfig --output=/boot/efi/EFI/redhat/grub.cfg

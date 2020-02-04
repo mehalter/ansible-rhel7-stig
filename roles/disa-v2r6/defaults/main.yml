@@ -1,4 +1,8 @@
 ---
+# generate hash using `grub2-mkpasswd-pbkdf2`
+# provided hash is for `defaultpassword`
+bootloader_password_hash: "grub.pbkdf2.sha512.10000.BC95FD85B8A38E9C3A097FE7F0E1D0D1439BD177D080A284D109CC556F2B30A75F9BBE8EF2360CD51B76C1E1FCAE78C5080D5F916CEB7ADE2A67DF581204EED5.3F7E1C601889B6BE266CC4A8A013295941EA2693B797B07CABDFF3C90FE968AE77A816D428951E0E7ACF4F12F160AAA95D0BF65D1136F9FB2D6BD75BD0C9177A"
+
 logon_banner: 'You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.\n\nBy using this IS (which includes any device attached to this IS), you consent to the following conditions:\n\n-The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.\n\n-At any time, the USG may inspect and seize data stored on this IS.\n\n-Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.\n\n-This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.\n\n-Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.'
 
 ssh_present: yes

@@ -1091,3 +1091,82 @@
   tags:
     - CAT-I
     - RHEL-07-010450
+
+- name: "CAT II | RHEL-07-010460 | The Red Hat Enterprise Linux operating system must not allow users to override SSH environment variables."
+  block:
+    - name: don't allow users to override ssh env variables
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "(?i)^#?PermitUserEnvironment"
+        line: PermitUserEnvironment no
+        validate: /usr/sbin/sshd -t -f %s
+      notify: restart sshd
+  tags:
+    - CAT-II
+    - RHEL-07-010460
+
+- name: "CAT II | RHEL-07-010470 | The Red Hat Enterprise Linux operating system must not allow a non-certificate trusted host SSH logon to the system."
+  block:
+    - name: don't allow users to ssh with non-certificate trusted logon
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "(?i)^#?HostbasedAuthentication"
+        line: HostbasedAuthentication no
+        validate: /usr/sbin/sshd -t -f %s
+      notify: restart sshd
+  tags:
+    - CAT-II
+    - RHEL-07-010470
+
+- name: |
+    "CAT I | RHEL-07-010480 | Red Hat Enterprise Linux operating systems prior to version 7.2 with a Basic Input/Output System (BIOS) must require authentication upon booting into single-user and maintenance modes."
+    "CAT I | RHEL-07-010482 | Red Hat Enterprise Linux operating systems version 7.2 or newer with a Basic Input/Output System (BIOS) must require authentication upon booting into single-user and maintenance modes."
+    "CAT I | RHEL-07-010490 | Red Hat Enterprise Linux operating systems prior to version 7.2 using Unified Extensible Firmware Interface (UEFI) must require authentication upon booting into single-user and maintenance modes."
+  block:
+    - debug:
+        msg:
+          - "This is not applicable for UEFI Systems"
+          - "This is not applicable for RHEL >7.2"
+  tags:
+    - CAT-I
+    - RHEL-07-010480
+    - RHEL-07-010482
+    - RHEL-07-010490
+
+- name: "CAT II | RHEL-07-010481 | The Red Hat Enterprise Linux operating system must require authentication upon booting into single-user and maintenance modes."
+  block:
+    - name: make sure authentication is required for singled-user mode
+      lineinfile:
+        create: true
+        dest: /usr/lib/systemd/system/rescue.service
+        regexp: ^#?ExecStart=
+        line: ExecStart=-/bin/sh -c "/usr/sbin/sulogin; /usr/bin/systemctl --fail --no-block default"
+  tags:
+    - CAT-II
+    - RHEL-07-010481
+
+- name: "CAT I | RHEL-07-010491 | Red Hat Enterprise Linux operating systems version 7.2 or newer using Unified Extensible Firmware Interface (UEFI) must require authentication upon booting into single-user and maintenance modes."
+  block:
+    - name: verify bootloader authentication password
+      lineinfile:
+        path: /boot/efi/EFI/redhat/user.cfg
+        create: yes
+        regexp: ^GRUB2_PASSWORD=
+        line: GRUB2_PASSWORD={{ bootloader_password_hash }}
+      notify: make grub2 config
+    - name: verify superuser accounts for bootloader
+      lineinfile:
+        dest: /boot/efi/EFI/redhat/grub.cfg
+        create: yes
+        insertafter: EOF
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      notify: make grub2 config
+      with_items:
+        - regexp: ^\s*set superusers=
+          line: '    set superusers="root"'
+        - regexp: ^\s*export superusers
+          line: '    export superusers'
+  tags:
+    - CAT-I
+    - RHEL-07-010491
