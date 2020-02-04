@@ -1170,3 +1170,23 @@
   tags:
     - CAT-I
     - RHEL-07-010491
+
+- name: "CAT I | RHEL-07-020000 | The Red Hat Enterprise Linux operating system must not have the rsh-server package installed."
+  block:
+    - name: make sure rsh-server is not installed
+      yum:
+        name: rsh-server
+        state: absent
+  tags:
+    - CAT-I
+    - RHEL-07-020000
+
+- name: "CAT I | RHEL-07-020010 | The Red Hat Enterprise Linux operating system must not have the ypserv package installed."
+  block:
+    - name: make sure ypserv is not installed
+      yum:
+        name: ypserv
+        state: absent
+  tags:
+    - CAT-I
+    - RHEL-07-020010
