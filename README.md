@@ -10,3 +10,15 @@ This is heavily based on the [MindPointGroup/RHEL7-STIG](https://github.com/Mind
 | Severity | Vulid   | STIG-ID        |
 |----------|---------|----------------|
 | CAT-II   | V-71965 | RHEL-07-010500 |
+| CAT-II   | V-92255 | RHEL-07-020019 |
+| CAT-II   | V-71971 | RHEL-07-020020 |
+| CAT-II   | V-71973 | RHEL-07-020030 |
+| CAT-II   | V-71975 | RHEL-07-020040 |
+| CAT-I    | V-71997 | RHEL-07-020250 |
+| CAT-II   | V-71999 | RHEL-07-020260 |
+| CAT-II   | V-72003 | RHEL-07-020300 |
+| CAT-I    | V-72005 | RHEL-07-020310 |
+| CAT-II   | V-72007 | RHEL-07-020320 |
+| CAT-II   | V-72009 | RHEL-07-020330 |
+| CAT-II   | V-72011 | RHEL-07-020600 |
+| CAT-II   | V-72015 | RHEL-07-020620 |
