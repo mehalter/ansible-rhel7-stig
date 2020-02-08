@@ -1403,4 +1403,109 @@
     - CAT-II
     - RHEL-07-020610
 
-- name: "CAT"
+- name: "CAT II | RHEL-07-021100 | The Red Hat Enterprise Linux operating system must have cron logging implemented."
+  lineinfile:
+    path: /etc/rsyslog.conf
+    state: present
+    regexp: '^cron\.\*[ \t]+/var/log/cron$'
+    line: 'cron.*                                                  /var/log/cron'
+    insertafter: '#### RULES ####'
+  register: result
+  failed_when:
+    - result is failed
+    - result.rc != 257
+  when: rhel_07_021100
+  tags:
+    - CAT-II
+    - RHEL-07-021100
+
+- name: "CAT II | RHEL-07-021110 | The Red Hat Enterprise Linux operating system must be configured so that the cron.allow file, if it exists, is owned by root."
+  block:
+    stat:
+      path: /etc/cron.allow
+      register: cron_allow
+    file:
+      dest: /etc/cron.allow
+      state: file
+      owner: root
+      group: root
+      mode: 0600
+    when: cron_allow.exists
+  tags:
+    - CAT-II
+    - RHEL-07-021110
+    - RHEL-07-021120
+
+- name: "CAT II| RHEL-07-021300 | The Red Hat Enterprise Linux operating system must disable Kernel core dumps unless needed."
+  block:
+    - name: "Register status of kdump"
+      shell: "systemctl show kdump | grep LoadState | cut -d = -f 2"
+      register: rhel_07_021300_kdump_service_status
+      changed_when: no
+      check_mode: no
+
+    - name: "Disable kdump if it's loaded"
+      service:
+          name: kdump
+          enabled: no
+          state: stopped
+      when:
+        - rhel_07_021300_kdump_service_status.stdout == "loaded"
+        - not rhel7stig_kdump_required
+  when: rhel_07_021300
+  tags:
+    - CAT-II  
+    - RHEL-07-021300
+
+- name: "CAT I | RHEL-07-021710 |The Red Hat Enterprise Linux operating system must not have the telnet-server package installed "
+  yum:
+    name: telnet-server
+    state: absent
+  tags:
+    - CAT-I
+    - RHEL-07-021710
+
+- name: "CAT I | RHEL-07-030000 | The Red Hat Enterprise Linux operating system must be configured so that auditing is configured to produce records containing information to establish what type of events occurred, where the events occurred, the source of the events, and the outcome of the events. These audit records must also identify individual identities of group account users."
+  block:
+    - name: "ensure auditd is present"
+      yum:
+        name: audit
+        state: present
+
+    - name: "ensure auditd is enable and started"
+      service:
+        name: auditd
+        state: started
+        enabled: yes
+  tags:
+    - CAT-I
+    - RHEL-07-030000
+
+## 030010-030920	Audit stuff
+
+##031000 and  RHEL-07-031010 pull from logging.yml may need to be manual depending on loggin solution
+
+
+- name: "CAT III| RHEL-07-040000 | The Red Hat Enterprise Linux operating system must limit the number of concurrent sessions to 10 for all accounts and/or account types."
+  lineinfile:
+    state: present
+    dest: /etc/security/limits.conf
+    insertbefore: '^# End of file'
+    regexp: '^\*.*maxlogins'
+    line: '*               hard    maxlogins       10'
+  tags:
+    - CAT-III
+    - RHEL-07-040000
+
+- name: "CAT II | RHEL-07-040110 | The Red Hat Enterprise Linux operating system must use a FIPS 140-2 approved cryptographic algorithm for SSH communications."
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "(?i)^#?Ciphers"
+    line: Ciphers aes128-ctr,aes192-ctr,aes256-ctr
+    validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+    - CAT-II
+    - RHEL-07-040110
+
+### RHEL-07-040160
