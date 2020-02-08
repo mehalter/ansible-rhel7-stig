@@ -1376,3 +1376,53 @@
     - CAT-II
     - RHEL-07-020260
 
+ 
+- name: "CAT II | RHEL-07-020270 | The Red Hat Enterprise Linux operating system must not have unnecessary accounts."
+  block:
+    - name: "Check for uneccessary accounts."
+      command: "grep '^{{ item }}:' /etc/passwd"
+      check_mode: no
+      failed_when: rhel_07_020270_audit.rc > 1
+      changed_when: rhel_07_020270_audit.rc == 0
+      register: rhel_07_020270_audit
+      with_items: 
+        - 'ftp'
+        - 'games'
+
+    - name: "remove the accounts if they exist."
+      user:
+          name: "{{ item }}"
+          state: absent
+          remove: no
+      register: rhel_07_020270_patch
+      with_items:
+        - 'ftp'
+        - 'games'
+
+  when: rhel_07_020270
+  tags:
+    - CAT-II
+    - RHEL-07-020270
+
+- name: "CAT III | RHEL-07-020300 | The Red Hat Enterprise Linux operating system must be configured so that all Group Identifiers (GIDs) referenced in the /etc/passwd file are defined in the /etc/group file."
+  block:
+    - name: "check for no group ids"
+      shell: pwck -r | grep 'no group' | awk '{ gsub("[:\47]",""); print $2}'
+      changed_when: no
+      failed_when: no
+      check_mode: no
+      register: gid_check
+    - name: "display warning"
+      debug:
+        msg: "WARNING! {{ gid_check.stdout_lines }} do NOT have GIDs"
+      when: gid_check.stdout_lines
+  tags:
+    - CAT-III
+    - RHEL-07-020300
+# - name: "CAT I | RHEL-07-020310 | The Red Hat Enterprise Linux operating system must be configured so that the root account must be the only account having unrestricted access to the system. "
+
+- name: "CAT II | RHEL-07-020320 | The Red Hat Enterprise Linux operating system must be configured so that all files and directories have a valid owner."
+  block:
+    - name: "FInd all files without an owner"
+      command: find "{{ item.mount }}" -
+    - name: "Display all the files that need correcting"
