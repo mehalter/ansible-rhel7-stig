@@ -1191,6 +1191,7 @@
     - CAT-I
     - RHEL-07-020010
 
+<<<<<<< HEAD
 #- name: "CAT II | RHEL-07-020020 | The Red Hat Enterprise Linux operating system must prevent non-privileged users from executing privileged functions to include disabling, circumventing, or altering implemented security safeguards/countermeasures."
 #  block:
 #    - name: check authorized users
@@ -1247,6 +1248,11 @@
 - name: "CAT I | RHEL-07-020050 | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
     - name: "set yum to verify the signature of packages"
+=======
+- name: "CAT I | RHEL-07-020050 | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
+  block:
+    - name: verify all packages verify gpg keys
+>>>>>>> upstream/master
       lineinfile:
         dest: /etc/yum.conf
         regexp: ^gpgcheck
@@ -1256,9 +1262,15 @@
     - CAT-I
     - RHEL-07-020050
 
+<<<<<<< HEAD
 - name: "CAT I | RHEL-07-020060  | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
     - name: "set local gpg key check"
+=======
+- name: "CAT I | RHEL-07-020060 | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
+  block:
+    - name: verify all packages verify gpg keys
+>>>>>>> upstream/master
       lineinfile:
         dest: /etc/yum.conf
         regexp: ^localpkg_gpgcheck
@@ -1269,6 +1281,7 @@
     - RHEL-07-020060
 
 - name: "CAT II | RHEL-07-020100 | The Red Hat Enterprise Linux operating system must be configured to disable USB mass storage."
+<<<<<<< HEAD
   lineinfile:
     dest: /etc/modprobe.d/blacklist.conf
     insertafter: "{{ item.insertafter }}"
@@ -1301,10 +1314,66 @@
         - RHEL-07-020110
 
     - name: "Disable autofs"
+=======
+  block:
+    - name: verify usb storage is disabled
+      lineinfile:
+        dest: /etc/modprobe.d/usb-storage.conf
+        insertafter: "{{ item.insertafter }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        create: yes
+        owner: root
+        group: root
+        mode: "0644"
+      with_items:
+        - insertafter: "^#blacklist usb-storage(\\s+|$)"
+          regexp: "^blacklist usb-storage(\\s+|$)"
+          line: 'blacklist usb-storage'
+        - insertafter: "^#install usb-storage"
+          regexp: "^install usb-storage"
+          line: install usb-storage /bin/true
+  tags:
+    - CAT-II
+    - RHEL-07-020100
+
+- name: "CAT II | RHEL-07-020101 | The Red Hat Enterprise Linux operating system must be configured so that the Datagram Congestion Control Protocol (DCCP) kernel module is disabled unless required."
+  block:
+    - name: verify dccp is disabled
+      lineinfile:
+        dest: /etc/modprobe.d/dccp.conf
+        insertafter: "{{ item.insertafter }}"
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        create: yes
+        owner: root
+        group: root
+        mode: "0644"
+      with_items:
+        - insertafter: ^#blacklist dccp
+          regexp: ^blacklist dccp(\s+|$)
+          line: blacklist dccp
+        - insertafter: ^#install dccp
+          regexp: "^install dccp "
+          line: install dccp /bin/true
+  tags:
+    - CAT-II
+    - RHEL-07-020101
+
+- name: "CAT II | RHEL-07-020110 | The Red Hat Enterprise Linux operating system must disable the file system automounter unless required."
+  block:
+    - name: check if autofs exists
+      shell: "systemctl show autofs | grep LoadState | cut -d = -f 2"
+      register: autofs_service_check
+      changed_when: no
+      check_mode: no
+    - name: verify autofs is disabled
+>>>>>>> upstream/master
       service:
         name: autofs
         enabled: no
         state: stopped
+<<<<<<< HEAD
       when:
         - autofs_service_status == "loaded"
   tags:
@@ -1318,22 +1387,48 @@
           regexp: ^#?clean_requirements_on_remove
           line: clean_requirements_on_remove=1
           insertafter: '\[main\]'
+=======
+      when: autofs_service_check == "loaded"
+  tags:
+    - CAT-II
+    - RHEL-07-020110
+
+- name: "CAT III | RHEL-07-020200 | The Red Hat Enterprise Linux operating system must remove all software components after updated versions have been installed."
+  block:
+    - name: check if yum cleans components after updating
+      lineinfile:
+        dest: /etc/yum.conf
+        regexp: ^#?clean_requirements_on_remove
+        line: clean_requirements_on_remove=1
+        insertafter: '\[main\]'
+>>>>>>> upstream/master
   tags:
     - CAT-III
     - RHEL-07-020200
 
 - name: |
+<<<<<<< HEAD
     "CAT I | RHEL-07-20210 | The Red Hat Enterprise Linux operating system must enable SELinux."
     "CAT I | RHEL-07-20220 | The Red Hat Enterprise Linux operating system must targeted SELinux."
   selinux: 
       state: enforcing
       policy: targeted
   check_mode: "{{ ansibe_check_mode or ansible_is_chroot }}"
+=======
+  "CAT I | RHEL-07-020210 | The Red Hat Enterprise Linux operating system must enable SELinux."
+  "CAT I | RHEL-07-020220 | The Red Hat Enterprise Linux operating system must enable the SELinux targeted policy."
+  block:
+    - name: check if SELinux is enforcing
+      selinux:
+        state: enforcing
+        policy: targeted
+>>>>>>> upstream/master
   tags:
     - CAT-I
     - RHEL-07-020210
     - RHEL-07-020220
 
+<<<<<<< HEAD
 - name: "CAT I | RHEL-07-20230 | The Red Hat Enterprise Linux operating system must be configured so that the x86 Ctrl-Alt-Delete key sequence is disabled on the command line."
   shell: /bin/systemctl mask ctrl-alt-del.target
   args:
@@ -1426,3 +1521,51 @@
     - name: "FInd all files without an owner"
       command: find "{{ item.mount }}" -
     - name: "Display all the files that need correcting"
+=======
+- name: "CAT I | RHEL-07-020230 | The Red Hat Enterprise Linux operating system must be configured so that the x86 Ctrl-Alt-Delete key sequence is disabled on the command line."
+  block:
+    - name: mask ctrl-alt-delete
+      file:
+        src: /dev/null
+        dest: /etc/systemd/system/ctrl-alt-del.target
+        state: link
+  tags:
+    - CAT-I
+    - RHEL-07-020230
+
+- name: "CAT I | RHEL-07-020231 | The Red Hat Enterprise Linux operating system must be configured so that the x86 Ctrl-Alt-Delete key sequence is disabled in the GUI."
+  block:
+    - name: disable ctrl-alt-delete for GUI
+      copy:
+        dest: /etc/dconf/db/local.d/00-disable-CAD
+        content: |
+          [org/gnome/settings-daemon/plugins/media-keys]
+          logout=''
+        mode: '0644'
+      notify: dconf update
+  tags:
+    - CAT-I
+    - RHEL-07-020231
+
+- name: "CAT II | RHEL-07-020240 | The Red Hat Enterprise Linux operating system must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
+  block:
+    - name: make sure users can only read and modify their own files
+      lineinfile:
+        dest: /etc/login.defs
+        regexp: ^#?UMASK
+        line: "UMASK 077"
+  tags:
+    - CAT-II
+    - RHEL-07-020240
+
+- name: "CAT II | RHEL-07-020610 | The Red Hat Enterprise Linux operating system must be configured so that all local interactive user accounts, upon creation, are assigned a home directory."
+  block:
+    - name: make all new users are assigned a home directory
+      lineinfile:
+        dest: /etc/login.defs
+        regexp: ^#?CREATE_HOME
+        line: "CREATE_HOME yes"
+  tags:
+    - CAT-II
+    - RHEL-07-020610
+>>>>>>> upstream/master

@@ -8,3 +8,6 @@
 
 - name: make grub2 config
   command: /usr/sbin/grub2-mkconfig --output=/boot/efi/EFI/redhat/grub.cfg
+
+- name: dconf update
+  command: dconf update
