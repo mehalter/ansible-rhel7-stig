@@ -1191,7 +1191,6 @@
     - CAT-I
     - RHEL-07-020010
 
-<<<<<<< HEAD
 #- name: "CAT II | RHEL-07-020020 | The Red Hat Enterprise Linux operating system must prevent non-privileged users from executing privileged functions to include disabling, circumventing, or altering implemented security safeguards/countermeasures."
 #  block:
 #    - name: check authorized users
@@ -1248,11 +1247,6 @@
 - name: "CAT I | RHEL-07-020050 | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
     - name: "set yum to verify the signature of packages"
-=======
-- name: "CAT I | RHEL-07-020050 | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
-  block:
-    - name: verify all packages verify gpg keys
->>>>>>> upstream/master
       lineinfile:
         dest: /etc/yum.conf
         regexp: ^gpgcheck
@@ -1262,15 +1256,9 @@
     - CAT-I
     - RHEL-07-020050
 
-<<<<<<< HEAD
-- name: "CAT I | RHEL-07-020060  | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
-  block:
-    - name: "set local gpg key check"
-=======
 - name: "CAT I | RHEL-07-020060 | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components of local packages without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
     - name: verify all packages verify gpg keys
->>>>>>> upstream/master
       lineinfile:
         dest: /etc/yum.conf
         regexp: ^localpkg_gpgcheck
@@ -1281,40 +1269,6 @@
     - RHEL-07-020060
 
 - name: "CAT II | RHEL-07-020100 | The Red Hat Enterprise Linux operating system must be configured to disable USB mass storage."
-<<<<<<< HEAD
-  lineinfile:
-    dest: /etc/modprobe.d/blacklist.conf
-    insertafter: "{{ item.insertafter }}"
-    regexp: "{{ item.regexp }}"
-    line: "{{ item.line }}"
-    create: yes
-    owner: root
-    group: root
-    mode: "0644"
-  with_items:
-    - insertafter: "^#blacklist usb-storage(\\s+|$)"
-      regexp: "^blacklist usb-storage(\\s+|$)"
-      line: 'blacklist usb-storage'
-    - insertafter: "^#install usb-storage"
-      regexp: "^install usb-storage"
-      line: install usb-storage /bin/true
-  when: rhel_07_020100
-  tags:
-      - CAT-II
-      - RHEL-07-020100
-
-- name: "CAT II | RHEL-07-020110 | The Red Hat Enterprise Linux operating system must disable the file system automounter unless required."
-  block:
-    - name: "Check if autofs is loaded"
-      shell: "systemctl show autofs | grep LoadState | cut -d = -f 2"
-      register: autofs_service_status
-      changed_when: no
-      check_mode: no
-      tags:
-        - RHEL-07-020110
-
-    - name: "Disable autofs"
-=======
   block:
     - name: verify usb storage is disabled
       lineinfile:
@@ -1368,26 +1322,10 @@
       changed_when: no
       check_mode: no
     - name: verify autofs is disabled
->>>>>>> upstream/master
       service:
         name: autofs
         enabled: no
         state: stopped
-<<<<<<< HEAD
-      when:
-        - autofs_service_status == "loaded"
-  tags:
-    - RHEL-07-020110
-
-- name: "CAT III | RHEL-07-020200 | The Red Hat Enterprise Linux operating system must remove all software components after updated versions have been installed."
-  block: 
-    - name: "set yum to clean up the unneeded packages"
-      lineinfile:
-          dest: /etc/yum.conf
-          regexp: ^#?clean_requirements_on_remove
-          line: clean_requirements_on_remove=1
-          insertafter: '\[main\]'
-=======
       when: autofs_service_check == "loaded"
   tags:
     - CAT-II
@@ -1401,127 +1339,23 @@
         regexp: ^#?clean_requirements_on_remove
         line: clean_requirements_on_remove=1
         insertafter: '\[main\]'
->>>>>>> upstream/master
   tags:
     - CAT-III
     - RHEL-07-020200
 
 - name: |
-<<<<<<< HEAD
-    "CAT I | RHEL-07-20210 | The Red Hat Enterprise Linux operating system must enable SELinux."
-    "CAT I | RHEL-07-20220 | The Red Hat Enterprise Linux operating system must targeted SELinux."
-  selinux: 
-      state: enforcing
-      policy: targeted
-  check_mode: "{{ ansibe_check_mode or ansible_is_chroot }}"
-=======
-  "CAT I | RHEL-07-020210 | The Red Hat Enterprise Linux operating system must enable SELinux."
-  "CAT I | RHEL-07-020220 | The Red Hat Enterprise Linux operating system must enable the SELinux targeted policy."
+    "CAT I | RHEL-07-020210 | The Red Hat Enterprise Linux operating system must enable SELinux."
+    "CAT I | RHEL-07-020220 | The Red Hat Enterprise Linux operating system must enable the SELinux targeted policy."
   block:
     - name: check if SELinux is enforcing
       selinux:
         state: enforcing
         policy: targeted
->>>>>>> upstream/master
   tags:
     - CAT-I
     - RHEL-07-020210
     - RHEL-07-020220
 
-<<<<<<< HEAD
-- name: "CAT I | RHEL-07-20230 | The Red Hat Enterprise Linux operating system must be configured so that the x86 Ctrl-Alt-Delete key sequence is disabled on the command line."
-  shell: /bin/systemctl mask ctrl-alt-del.target
-  args:
-    warn: false
-  tags: 
-    - CAT-I
-    - RHEL-07-020230
-
-- name: "CAT II | RHEL-07-020240 | The Red Hat Enterprise Linux operating system must define default permissions for all authenticated users in such a way that the user can only read and modify their own files."
-  lineinfile:
-    path: /etc/login.defs
-    regexp: ^#?UMASK
-    line: "UMASK  077"
-  tags:
-    - CAT-II
-    - RHEL-07-020240	
-
-#- name: "CAT I | RHEL-07-020250 | The Red Hat Enterprise Linux operating system must be a vendor supported release."
-#  block:
-#   name: check release version
-#   shell:
-#     cat /etc/redhat-release | grep 7.*
-#   register: rhel_version
-#   debug:
-#     msg: Minumum suppported vertsion is 7.5. Your version is {{ rhel_version }}. Please upgrade
-#   failed_when:
-#     - rhel_version < 7.5
-# tags:
-#   - CAT-I
-#   - RHEL-07-020250
-
-
-#### WONT work offline with out a local repo on the network ########
-- name: "CAT II | RHEL-07-020260 | The Red Hat Enterprise Linux operating system security patches and updates must be installed and up to date."
-  yum:
-      name: '*'
-      state: latest
-  when: rhel_07_020260
-  tags:
-    - CAT-II
-    - RHEL-07-020260
-
- 
-- name: "CAT II | RHEL-07-020270 | The Red Hat Enterprise Linux operating system must not have unnecessary accounts."
-  block:
-    - name: "Check for uneccessary accounts."
-      command: "grep '^{{ item }}:' /etc/passwd"
-      check_mode: no
-      failed_when: rhel_07_020270_audit.rc > 1
-      changed_when: rhel_07_020270_audit.rc == 0
-      register: rhel_07_020270_audit
-      with_items: 
-        - 'ftp'
-        - 'games'
-
-    - name: "remove the accounts if they exist."
-      user:
-          name: "{{ item }}"
-          state: absent
-          remove: no
-      register: rhel_07_020270_patch
-      with_items:
-        - 'ftp'
-        - 'games'
-
-  when: rhel_07_020270
-  tags:
-    - CAT-II
-    - RHEL-07-020270
-
-- name: "CAT III | RHEL-07-020300 | The Red Hat Enterprise Linux operating system must be configured so that all Group Identifiers (GIDs) referenced in the /etc/passwd file are defined in the /etc/group file."
-  block:
-    - name: "check for no group ids"
-      shell: pwck -r | grep 'no group' | awk '{ gsub("[:\47]",""); print $2}'
-      changed_when: no
-      failed_when: no
-      check_mode: no
-      register: gid_check
-    - name: "display warning"
-      debug:
-        msg: "WARNING! {{ gid_check.stdout_lines }} do NOT have GIDs"
-      when: gid_check.stdout_lines
-  tags:
-    - CAT-III
-    - RHEL-07-020300
-# - name: "CAT I | RHEL-07-020310 | The Red Hat Enterprise Linux operating system must be configured so that the root account must be the only account having unrestricted access to the system. "
-
-- name: "CAT II | RHEL-07-020320 | The Red Hat Enterprise Linux operating system must be configured so that all files and directories have a valid owner."
-  block:
-    - name: "FInd all files without an owner"
-      command: find "{{ item.mount }}" -
-    - name: "Display all the files that need correcting"
-=======
 - name: "CAT I | RHEL-07-020230 | The Red Hat Enterprise Linux operating system must be configured so that the x86 Ctrl-Alt-Delete key sequence is disabled on the command line."
   block:
     - name: mask ctrl-alt-delete
@@ -1568,4 +1402,5 @@
   tags:
     - CAT-II
     - RHEL-07-020610
->>>>>>> upstream/master
+
+- name: "CAT"
