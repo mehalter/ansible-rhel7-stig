@@ -53,3 +53,10 @@ This is heavily based on the [MindPointGroup/RHEL7-STIG](https://github.com/Mind
 | CAT-II   | V-72075 | RHEL-07-021700 |
 | CAT-I    | V-72213 | RHEL-07-032000 |
 | CAT-II   | V-72219 | RHEL-07-040100 |
+| CAT II   | V-72081 | RHEL-07-030010 | can be changed to f1 for availability
+| CAT II   | V-72083 | RHEL-07-030300 |
+| CAT II   | V-72087 | RHEL-07-030320 |
+| CAT II   | V-72063 | RHEL-07-030321 |
+| CAT II   | V-72089 | RHEL-07-030330 |
+| CAT II   | V-72091 | RHEL-07-030340 |
+| CAT II   | V-72093 | RHEL-07-030350 |
