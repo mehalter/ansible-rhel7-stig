@@ -1568,7 +1568,7 @@
     - CAT-II
     - RHEL-07-030380
 
-- name: CAT II | RHEL-07-030390 | The Red Hat Enterprise Linux operating system must audit all uses of the lchown syscall
+- name: " CAT II | RHEL-07-030390 | The Red Hat Enterprise Linux operating system must audit all uses of the lchown syscall"
   # lChown usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1577,10 +1577,10 @@
     -  '-a always,exit -F arch=b32 -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod'
     -  '-a always,exit -F arch=b64 -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod'
   tags:
-    - CAT II 
+    - CAT-II 
     - RHEL-07-030390
 
-- name: CAT II | RHEL-07-030400 | The Red Hat Enterprise Linux operating system must audit all uses of the fchownat syscall.
+- name: " CAT II | RHEL-07-030400 | The Red Hat Enterprise Linux operating system must audit all uses of the fchownat syscall."
   # fChownat usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1592,7 +1592,7 @@
     - CAT-II
     - RHEL-07-030400
 
-- name: CAT II | RHEL-07-030410 | The Red Hat Enterprise Linux operating system must audit all uses of the chmod syscall.
+- name: " CAT II | RHEL-07-030410 | The Red Hat Enterprise Linux operating system must audit all uses of the chmod syscall."
   # chmod usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1604,7 +1604,7 @@
     - CAT-II
     - RHEL-07-030410
     
-- name: CAT II | RHEL-07-030420 | The Red Hat Enterprise Linux operating system must audit all uses of the fchmod syscall.
+- name: " CAT II | RHEL-07-030420 | The Red Hat Enterprise Linux operating system must audit all uses of the fchmod syscall."
   # fchmod usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1616,7 +1616,7 @@
     - CAT-II
     - RHEL-07-030420
 
-- name: CAT II | RHEL-07-030430 | The Red Hat Enterprise Linux operating system must audit all uses of the fchmodat syscall.
+- name: " CAT II | RHEL-07-030430 | The Red Hat Enterprise Linux operating system must audit all uses of the fchmodat syscall"
   # fchmodat usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1628,7 +1628,7 @@
     - CAT-II
     - RHEL-07-030430
 
-- name: CAT II | RHEL-07-030440 | The Red Hat Enterprise Linux operating system must audit all uses of the setxattr syscall.
+- name: " CAT II | RHEL-07-030440 | The Red Hat Enterprise Linux operating system must audit all uses of the setxattr syscall."
   # setxattr usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1640,7 +1640,7 @@
     - CAT-II
     - RHEL-07-030440
 
-- name: CAT II | RHEL-07-030450 | The Red Hat Enterprise Linux operating system must audit all uses of the fsetxattr syscall.
+- name: " CAT II | RHEL-07-030450 | The Red Hat Enterprise Linux operating system must audit all uses of the fsetxattr syscall."
 # fsetxattr usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1652,7 +1652,7 @@
     - CAT-II
     - RHEL-07-030450
 
-- name: CAT II | RHEL-07-030460 | The Red Hat Enterprise Linux operating system must audit all uses of the lsetxattr syscall.
+- name: " CAT II | RHEL-07-030460 | The Red Hat Enterprise Linux operating system must audit all uses of the lsetxattr syscall."
   # lsetxattr usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1664,7 +1664,7 @@
     - CAT-II
     - RHEL-07-030460
 
-- name: CAT II | RHEL-07-030470 | The Red Hat Enterprise Linux operating system must audit all uses of the removexattr syscall.
+- name: " CAT II | RHEL-07-030470 | The Red Hat Enterprise Linux operating system must audit all uses of the removexattr syscall."
   # removexattr usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1676,7 +1676,7 @@
     - CAT-II
     - RHEL-07-030470
 
-- name: CAT II | RHEL-07-030480 | The Red Hat Enterprise Linux operating system must audit all uses of the fremovexattr syscall.
+- name: " CAT II | RHEL-07-030480 | The Red Hat Enterprise Linux operating system must audit all uses of the fremovexattr syscall."
   # fremovexattr usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1688,7 +1688,7 @@
     - CAT-II
     - RHEL-07-030480
 
-- name: CAT II | RHEL-07-030490 | The Red Hat Enterprise Linux operating system must audit all uses of the lremovexattr syscall.
+- name: " CAT II | RHEL-07-030490 | The Red Hat Enterprise Linux operating system must audit all uses of the lremovexattr syscall."
   # lremovexattr usage 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1700,8 +1700,7 @@
     - CAT-II
     - RHEL-07-030490
 
-- name: CAT II | RHEL-07-030500 | The Red Hat Enterprise Linux operating system must audit all uses of the creat syscall
-  # successful and unsuccessful uses of creat syscall
+- name: " CAT II | RHEL-07-030500 | The Red Hat Enterprise Linux operating system must audit all uses of the creat syscall"  # successful and unsuccessful uses of creat syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
     line: '{{ item }}' 
@@ -1714,7 +1713,7 @@
     - CAT-II
     - RHEL-07-030500
 
-- name: CAT II | RHEL-07-030510 | The Red Hat Enterprise Linux operating system must audit all uses of the open syscall.
+- name: " CAT II | RHEL-07-030510 | The Red Hat Enterprise Linux operating system must audit all uses of the open syscall."
   # successful and unsuccessful uses of open syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1728,7 +1727,7 @@
     - CAT-II
     - RHEL-07-030510
        
-- name: CAT II | RHEL-07-030520 | The Red Hat Enterprise Linux operating system must audit all uses of the openat syscall.
+- name: " CAT II | RHEL-07-030520 | The Red Hat Enterprise Linux operating system must audit all uses of the openat syscall."
   # successful and unsuccessful uses of openat syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1742,7 +1741,7 @@
     - CAT-II
     - RHEL-07-030520
 
-- name: CAT II | RHEL-07-030530 | The Red Hat Enterprise Linux operating system must audit all uses of the open_by_handle_at syscall.
+- name: " CAT II | RHEL-07-030530 | The Red Hat Enterprise Linux operating system must audit all uses of the open_by_handle_at syscall."
   # successful and unsuccessful uses of open_by_handle_at syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1756,7 +1755,7 @@
     - CAT-II
     - RHEL-07-030530
 
-- name: CAT II | RHEL-07-030540 | The Red Hat Enterprise Linux operating system must audit all uses of the truncate syscall.
+- name: " CAT II | RHEL-07-030540 | The Red Hat Enterprise Linux operating system must audit all uses of the truncate syscall."
   # successful and unsuccessful uses of truncate syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1770,7 +1769,7 @@
     - CAT-II
     - RHEL-07-030540
 
-- name: CAT II | RHEL-07-030550 | The Red Hat Enterprise Linux operating system must audit all uses of the ftruncate syscall.
+- name: " CAT II | RHEL-07-030550 | The Red Hat Enterprise Linux operating system must audit all uses of the ftruncate syscall."
   # successful and unsuccessful uses of ftruncate syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1784,7 +1783,7 @@
     - CAT-II
     - RHEL-07-030550
 
-- name: CAT II | RHEL-07-030560 | The Red Hat Enterprise Linux operating system must audit all uses of the semanage command.
+- name: " CAT II | RHEL-07-030560 | The Red Hat Enterprise Linux operating system must audit all uses of the semanage command."
   # successful and unsuccessful uses of semanage syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1795,7 +1794,7 @@
     - CAT-II
     - RHEL-07-030560
 
-- name: CAT II | RHEL-07-030570 | The Red Hat Enterprise Linux operating system must audit all uses of the setsebool command.
+- name: " CAT II | RHEL-07-030570 | The Red Hat Enterprise Linux operating system must audit all uses of the setsebool command."
   # successful and unsuccessful uses of setsebool syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1806,7 +1805,7 @@
     - CAT-II
     - RHEL-07-030570
 
-- name: CAT II | RHEL-07-030580 | The Red Hat Enterprise Linux operating system must audit all uses of the setfiles command.
+- name: " CAT II | RHEL-07-030580 | The Red Hat Enterprise Linux operating system must audit all uses of the setfiles command."
   # successful and unsuccessful uses of chcon syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1817,7 +1816,7 @@
     - CAT-II
     - RHEL-07-030580
 
-- name: CAT II | RHEL-07-030590 | The Red Hat Enterprise Linux operating system must audit all uses of the setfiles command.
+- name: " CAT II | RHEL-07-030590 | The Red Hat Enterprise Linux operating system must audit all uses of the setfiles command."
   # successful and unsuccessful uses of setfiles syscall
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1828,7 +1827,7 @@
     - CAT-II
     - RHEL-07-030590
 
-- name: CAT II | RHEL-07-030610 | The Red Hat Enterprise Linux operating system must generate audit records for all unsuccessful account access events.
+- name: " CAT II | RHEL-07-030610 | The Red Hat Enterprise Linux operating system must generate audit records for all unsuccessful account access events."
   # failed logins
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1839,7 +1838,7 @@
     - CAT-II
     - RHEL-07-030610
 
-- name: CAT II | RHEL-07-030620 | The Red Hat Enterprise Linux operating system must generate audit records for all successful account access events.
+- name: " CAT II | RHEL-07-030620 | The Red Hat Enterprise Linux operating system must generate audit records for all successful account access events."
   # successful logins
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1850,7 +1849,7 @@
     - CAT-II
     - RHEL-07-030620
 
-- name: CAT II | RHEL-07-030630 | The Red Hat Enterprise Linux operating system must audit all uses of the passwd command.
+- name: " CAT II | RHEL-07-030630 | The Red Hat Enterprise Linux operating system must audit all uses of the passwd command."
   #  successful and unsuccessful attempts to use the "passwd" command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1861,7 +1860,7 @@
     - CAT-II
     - RHEL-07-030630
     
-- name: CAT II | RHEL-07-030640 | The Red Hat Enterprise Linux operating system must audit all uses of the unix_chkpwd command.
+- name: " CAT II | RHEL-07-030640 | The Red Hat Enterprise Linux operating system must audit all uses of the unix_chkpwd command."
   #  successful and unsuccessful attempts to use the unix_chkpwd command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1872,7 +1871,7 @@
     - CAT-II
     - RHEL-07-030640
     
-- name: CAT II | RHEL-07-030650 | The Red Hat Enterprise Linux operating system must audit all uses of the gpasswd command.
+- name: " CAT II | RHEL-07-030650 | The Red Hat Enterprise Linux operating system must audit all uses of the gpasswd command."
   #  successful and unsuccessful attempts to use the gpasswd command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1883,7 +1882,7 @@
     - CAT-II
     - RHEL-07-030650
     
-- name: CAT II | RHEL-07-030660 | The Red Hat Enterprise Linux operating system must audit all uses of the chage command.
+- name: " CAT II | RHEL-07-030660 | The Red Hat Enterprise Linux operating system must audit all uses of the chage command."
   #  successful and unsuccessful attempts to use the chage command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1894,7 +1893,7 @@
     - CAT-II
     - RHEL-07-030660
     
-- name: CAT II | RHEL-07-030670 | The Red Hat Enterprise Linux operating system must audit all uses of the userhelper command.
+- name: " CAT II | RHEL-07-030670 | The Red Hat Enterprise Linux operating system must audit all uses of the userhelper command."
   #  successful and unsuccessful attempts to use the userhelper command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1905,7 +1904,7 @@
     - CAT-II
     - RHEL-07-030670
     
-- name: CAT II | RHEL-07-030680 | The Red Hat Enterprise Linux operating system must audit all uses of the su command.
+- name: " CAT II | RHEL-07-030680 | The Red Hat Enterprise Linux operating system must audit all uses of the su command."
   #  successful and unsuccessful attempts to use the su command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1916,7 +1915,7 @@
     - CAT-II
     - RHEL-07-030680
     
-- name: CAT II | RHEL-07-030690 | The Red Hat Enterprise Linux operating system must audit all uses of the sudo command.
+- name: " CAT II | RHEL-07-030690 | The Red Hat Enterprise Linux operating system must audit all uses of the sudo command."
   #  successful and unsuccessful attempts to use the sudo command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1927,7 +1926,7 @@
     - CAT-II
     - RHEL-07-030690
     
-- name: CAT II | RHEL-07-030700 | The Red Hat Enterprise Linux operating system must audit all uses of the sudoers file and all files in the /etc/sudoers.d/ directory.
+- name: " CAT II | RHEL-07-030700 | The Red Hat Enterprise Linux operating system must audit all uses of the sudoers file and all files in the /etc/sudoers.d/ directory."
   #  successful and unsuccessful attempts to access the sudoers file and directory 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1939,7 +1938,7 @@
     - CAT-II
     - RHEL-07-030700
     
-- name: CAT II | RHEL-07-030710 | The Red Hat Enterprise Linux operating system must audit all uses of the newgrp command.
+- name: " CAT II | RHEL-07-030710 | The Red Hat Enterprise Linux operating system must audit all uses of the newgrp command."
   #  successful and unsuccessful attempts to use the newgrp command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1950,7 +1949,7 @@
     - CAT-II
     - RHEL-07-030710
 
-- name: CAT II | RHEL-07-030720 | The Red Hat Enterprise Linux operating system must audit all uses of the chsh command.
+- name: " CAT II | RHEL-07-030720 | The Red Hat Enterprise Linux operating system must audit all uses of the chsh command."
   #  successful and unsuccessful attempts to use the chsh command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1961,7 +1960,7 @@
     - CAT-II
     - RHEL-07-030720
 
-- name: CAT II | RHEL-07-030740 | The Red Hat Enterprise Linux operating system must audit all uses of the mount command and syscall.
+- name: " CAT II | RHEL-07-030740 | The Red Hat Enterprise Linux operating system must audit all uses of the mount command and syscall."
   #  successful and unsuccessful attempts to use the mount commands and syscalls 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1974,7 +1973,7 @@
     - CAT-II
     - RHEL-07-030740
 
-- name: CAT II | RHEL-07-030750 | The Red Hat Enterprise Linux operating system must audit all uses of the umount command.
+- name: " CAT II | RHEL-07-030750 | The Red Hat Enterprise Linux operating system must audit all uses of the umount command."
   #  successful and unsuccessful attempts to use the umount command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1985,7 +1984,7 @@
     - CAT-II
     - RHEL-07-030750
 
-- name: CAT II | RHEL-07-030760 | The Red Hat Enterprise Linux operating system must audit all uses of the postdrop command.
+- name: " CAT II | RHEL-07-030760 | The Red Hat Enterprise Linux operating system must audit all uses of the postdrop command."
   #  successful and unsuccessful attempts to use the postdrop command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -1996,7 +1995,7 @@
     - CAT-II
     - RHEL-07-030760
 
-- name: CAT II | RHEL-07-030770 | The Red Hat Enterprise Linux operating system must audit all uses of the postqueue command.
+- name: " CAT II | RHEL-07-030770 | The Red Hat Enterprise Linux operating system must audit all uses of the postqueue command."
      #  successful and unsuccessful attempts to use the postqueue command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2007,7 +2006,7 @@
     - CAT-II
     - RHEL-07-030770
 
-- name: CAT II | RHEL-07-030780 | The Red Hat Enterprise Linux operating system must audit all uses of the ssh-keysign command.
+- name: " CAT II | RHEL-07-030780 | The Red Hat Enterprise Linux operating system must audit all uses of the ssh-keysign command."
   #  successful and unsuccessful attempts to use the ssh-keysign command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2018,7 +2017,7 @@
     - CAT-II
     - RHEL-07-030780
 
-- name: CAT II | RHEL-07-030800 | The Red Hat Enterprise Linux operating system must audit all uses of the crontab command.
+- name: " CAT II | RHEL-07-030800 | The Red Hat Enterprise Linux operating system must audit all uses of the crontab command."
   #  successful and unsuccessful attempts to use the crontab command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2029,7 +2028,7 @@
     - CAT-II
     - RHEL-07-030800
         
-- name: CAT II | RHEL-07-030810 | The Red Hat Enterprise Linux operating system must audit all uses of the pam_timestamp_check command.
+- name: " CAT II | RHEL-07-030810 | The Red Hat Enterprise Linux operating system must audit all uses of the pam_timestamp_check command."
   #  successful and unsuccessful attempts to use the pam_timestamp_check command 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2040,7 +2039,7 @@
     - CAT-II
     - RHEL-07-030810
 
-- name: CAT II | RHEL-07-030819 | The Red Hat Enterprise Linux operating system must audit all uses of the create_module syscall.
+- name: " CAT II | RHEL-07-030819 | The Red Hat Enterprise Linux operating system must audit all uses of the create_module syscall."
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
     line: '{{ item }}' 
@@ -2051,7 +2050,7 @@
     - CAT-II
     - RHEL-07-030819
 
-- name: CAT II | RHEL-07-030820 | The Red Hat Enterprise Linux operating system must audit all uses of the init_module syscall.
+- name: " CAT II | RHEL-07-030820 | The Red Hat Enterprise Linux operating system must audit all uses of the init_module syscall."
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
     line: '{{ item }}' 
@@ -2062,7 +2061,7 @@
     - CAT-II
     - RHEL-07-030820
 
-- name: CAT II | RHEL-07-030821 | The Red Hat Enterprise Linux operating system must audit all uses of the finit_module syscall.
+- name: " CAT II | RHEL-07-030821 | The Red Hat Enterprise Linux operating system must audit all uses of the finit_module syscall."
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
     line: '{{ item }}' 
@@ -2073,7 +2072,7 @@
     - CAT-II
     - RHEL-07-030821
 
-- name: CAT II | RHEL-07-030830 | The Red Hat Enterprise Linux operating system must audit all uses of the delete_module syscall.
+- name: " CAT II | RHEL-07-030830 | The Red Hat Enterprise Linux operating system must audit all uses of the delete_module syscall."
      #  successful and unsuccessful attempts to use the delete_module syscall occur 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2085,7 +2084,7 @@
     - CAT-II
     - RHEL-07-030830
 
-- name: CAT II | RHEL-07-030840 | The Red Hat Enterprise Linux operating system must audit all uses of the kmod command.
+- name: "CAT II | RHEL-07-030840 | The Red Hat Enterprise Linux operating system must audit all uses of the kmod command."
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
     line: '{{ item }}' 
@@ -2095,7 +2094,7 @@
     - CAT-II
     - RHEL-07-030840
 
-- name: CAT II | RHEL-07-030870 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/passwd.
+- name: "CAT II | RHEL-07-030870 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/passwd."
   # Configure the operating system to generate audit records for all account creations, modifications, disabling, and termination events that affect "/etc/passwd". 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2106,7 +2105,7 @@
     - CAT-II
     - RHEL-07-030870
 
-- name: CAT II | RHEL-07-030871 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group.
+- name: "CAT II | RHEL-07-030871 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/group."
   # onfigure the operating system to generate audit records for all account creations, modifications, disabling, and termination events that affect "/etc/group".
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2117,7 +2116,7 @@
     - CAT-II
     - RHEL-07-030871
 
-- name: CAT II | RHEL-07-030872 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/gshadow.
+- name: "CAT II | RHEL-07-030872 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/gshadow."
   # onfigure the operating system to generate audit records for all account creations, modifications, disabling, and termination events that affect "/etc/gshadow".
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2128,7 +2127,7 @@
     - CAT-II
     - RHEL-07-030872
 
-- name: CAT II | RHEL-07-030873 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow.
+- name: "CAT II | RHEL-07-030873 | The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/shadow."
   # onfigure the operating system to generate audit records for all account creations, modifications, disabling, and termination events that affect "/etc/shadow".
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2139,7 +2138,7 @@
     - CAT-II
     - RHEL-07-030873
 
-- name: CAT II | RHEL-07-030874 |The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/opasswd.
+- name: "CAT II | RHEL-07-030874 |The Red Hat Enterprise Linux operating system must generate audit records for all account creations, modifications, disabling, and termination events that affect /etc/opasswd."
   # onfigure the operating system to generate audit records for all account creations, modifications, disabling, and termination events that affect "/etc/opasswd".
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2150,7 +2149,7 @@
     - CAT-II
     - RHEL-07-030874
 
-- name: CAT II | RHEL-07-030880 | The Red Hat Enterprise Linux operating system must audit all uses of the rename syscall.
+- name: "CAT II | RHEL-07-030880 | The Red Hat Enterprise Linux operating system must audit all uses of the rename syscall."
   #  successful and unsuccessful attempts to use the rename syscall occur 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
@@ -2162,7 +2161,7 @@
     - CAT-II
     - RHEL-07-030880
 
-- name: CAT II | RHEL-07-030890 | The Red Hat Enterprise Linux operating system must audit all uses of the renameat syscall
+- name: "CAT II | RHEL-07-030890 | The Red Hat Enterprise Linux operating system must audit all uses of the renameat syscall"
   #  successful and unsuccessful attempts to use the renameat syscall occur 
   lineinfile:
     path: /etc/audit/rules.d/DISA-STIGs.rules
