@@ -1207,38 +1207,36 @@
     "CAT II | RHEL-07-020040 | The Red Hat Enterprise Linux operating system must be configured so that designated personnel are notified if baseline configurations are changed in an unauthorized manner."
   block:
     - name: ensure aide installed
-      shell: |
-        pack=$(yum list installed aide)
-        if [[ $pack -eq 0 ]]; then
-          exit 0
-        else
-          exit 1
-        fi 
+      command: rpm -q aide
       args:
         warn: false
       register: aide_installed
-      failed_when: aide_installed > 1
+      failed_when: aide_installed.rc == 1 
       changed_when: false
+    
     - name: ensure /etc/cron.daily/aide exists 
-      shell: |
-        file=/etc/cron.daily/aide
-        if [[ -f "$file" ]]; then
-          exit 0
-        else
-          exit 1
-        fi 
-      args:
-        warn: false
+      stat:
+        path: /etc/cron.daily/aide
       register: aide_cron_daily
-      failed_when: aide_cron_daily > 1
-      changed_when: false
+
+    - name: create  /etc/cron.daily/aide if it does not exist
+      file:
+        path: /etc/cron.daily/aide
+        state: touch
+        owner: root
+        group: root
+        mode: 0600
+        #create: yes
+      when: aide_cron_daily.stat.exists == false
+
     - name: ensure /etc/cron.daily/aide is set correctly
       lineinfile:
         path: /etc/cron.daily/aide
-        line: '{{item}}'
-      with_item:
+        line: '{{ item }}'
+      with_items:
         - '#!/bin/bash'
         - '/usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root'
+      when: aide_installed.rc == 0
   tags:
     - CAT-II
     - RHEL-07-020030
@@ -1359,16 +1357,22 @@
 - name: "CAT I | RHEL-07-020230 | The Red Hat Enterprise Linux operating system must be configured so that the x86 Ctrl-Alt-Delete key sequence is disabled on the command line."
   block:
     - name: mask ctrl-alt-delete
-      file:
-        src: /dev/null
-        dest: /etc/systemd/system/ctrl-alt-del.target
-        state: link
+      command: systemctl mask ctrl-alt-del.target
+      args:
+        warn: false
   tags:
     - CAT-I
     - RHEL-07-020230
 
 - name: "CAT I | RHEL-07-020231 | The Red Hat Enterprise Linux operating system must be configured so that the x86 Ctrl-Alt-Delete key sequence is disabled in the GUI."
   block:
+    - name: create /etc/dconf/db/local.d/00-disable-CAD
+      file:
+        path: /etc/dconf/db/local.d/00-disable-CAD
+        state: touch
+        owner: root
+        group: root
+
     - name: disable ctrl-alt-delete for GUI
       copy:
         dest: /etc/dconf/db/local.d/00-disable-CAD
@@ -1410,27 +1414,29 @@
     regexp: '^cron\.\*[ \t]+/var/log/cron$'
     line: 'cron.*                                                  /var/log/cron'
     insertafter: '#### RULES ####'
-  register: result
-  failed_when:
-    - result is failed
-    - result.rc != 257
-  when: rhel_07_021100
+  #register: result
+  #failed_when:
+  #  - result is failed
+  #  - result.rc != 257
   tags:
     - CAT-II
     - RHEL-07-021100
 
 - name: "CAT II | RHEL-07-021110 | The Red Hat Enterprise Linux operating system must be configured so that the cron.allow file, if it exists, is owned by root."
   block:
-    stat:
-      path: /etc/cron.allow
+    - name: "check for cron.allow"
+      stat:
+        path: /etc/cron.allow
       register: cron_allow
-    file:
-      dest: /etc/cron.allow
-      state: file
-      owner: root
-      group: root
-      mode: 0600
-    when: cron_allow.exists
+
+    - name: "set the persmissions, ownership, and group of cron.allow"
+      file:
+        dest: /etc/cron.allow
+        state: file
+        owner: root
+        group: root
+        mode: 0600
+      when: cron_allow.stat.exists == true
   tags:
     - CAT-II
     - RHEL-07-021110
@@ -1441,18 +1447,15 @@
     - name: "Register status of kdump"
       shell: "systemctl show kdump | grep LoadState | cut -d = -f 2"
       register: rhel_07_021300_kdump_service_status
-      changed_when: no
-      check_mode: no
+      #changed_when: no
+      #check_mode: no
 
     - name: "Disable kdump if it's loaded"
       service:
           name: kdump
           enabled: no
           state: stopped
-      when:
-        - rhel_07_021300_kdump_service_status.stdout == "loaded"
-        - not rhel7stig_kdump_required
-  when: rhel_07_021300
+      when: rhel_07_021300_kdump_service_status.stdout == "loaded"
   tags:
     - CAT-II  
     - RHEL-07-021300
@@ -1488,13 +1491,15 @@
 
 - name: "CAT II | RHEL-07-030200 | The Red Hat Enterprise Linux operating system must be configured to use the au-remote plugin."
   block:
-    stat:
-      path: /etc/audisp/plugins.d/au-remote.conf
-      register: au-remote_status
-    file: 
+    - name: "Check for  au-remote"
+      stat:
+        path: /etc/audisp/plugins.d/au-remote.conf
+      register: au_remote_status
+    - name: "Create au-remote.conf"  
+      file: 
         path: /etc/audisp/plugins.d/au-remote.conf
         state: touch
-    when: au-remote_status.exists == false
+      when: au_remote_status.stat.exists == false
 
 - name: |
     "CAT II | RHEL-07-030201 | The Red Hat Enterprise Linux operating system must configure the au-remote plugin to off-load audit logs using the audisp-remote daemon."
@@ -1504,11 +1509,11 @@
     - name: "regiester existence of au-remote.cont"
       stat:
         path: /etc/audisp/plugins.d/au-remote.conf
-        register: au-remote_change
+      register: au_remote_change
     - name: "Configure audispd.conf"
       lineinfile:
         path: /etc/audisp/plugins.d/au-remote.conf
-        line: '{{ itme }}'
+        line: '{{ item }}'
       with_items:
         - 'active = yes'
         - 'direction = out'
@@ -1516,7 +1521,7 @@
         - 'type = always'
         - 'overflow_action = syslog'
         - 'name_format = hostname'
-      when: au-remote_status.exists
+      when: au_remote_status.stat.exists
       tags:
         - CAT-II
         - RHEL-07-030201
