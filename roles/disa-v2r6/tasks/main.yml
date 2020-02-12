@@ -2245,4 +2245,26 @@
     - CAT-II
     - RHEL-07-040110
 
-### RHEL-07-040160
+- name: "CAT II | RHEL-07-040160 | The Red Hat Enterprise Linux operating system must be configured so that all network connections associated with a communication session are terminated at the end of the session or after 10 minutes of inactivity from the user at a command prompt, except to fulfill documented and validated mission requirements."
+  block:    
+    - name: "create the file"
+      file:
+        dest: /etc/profile.d/tmout.sh
+        state: touch
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: "append the file"
+      blockinfile:
+        path: /etc/profile.d/tmout.sh
+        block: |
+          #!/bin/bash
+          TMOUT=600
+          readonly TMOUT
+          export TMOUT
+  tags:
+    - CAT-II
+    - RHEL-07-040160
+
+
