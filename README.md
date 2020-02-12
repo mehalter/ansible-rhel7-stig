@@ -32,7 +32,7 @@ This is heavily based on the [MindPointGroup/RHEL7-STIG](https://github.com/Mind
 | CAT-II   | V-72031 | RHEL-07-020700 |
 | CAT-II   | V-72033 | RHEL-07-020710 |
 | CAT-II   | V-72035 | RHEL-07-020720 |
-| CAT-II   | V-72037 | RHEL-07-020730 | Might be able to automate
+| CAT-II   | V-72037 | RHEL-07-020730 |
 | CAT-II   | V-72039 | RHEL-07-020900 |
 | CAT-II   | V-72043 | RHEL-07-021010 |
 | CAT-II   | V-72045 | RHEL-07-021020 | 
@@ -46,17 +46,13 @@ This is heavily based on the [MindPointGroup/RHEL7-STIG](https://github.com/Mind
 | CAT-III  | V-72061 | RHEL-07-021320 |
 | CAT-III  | V-72063 | RHEL-07-021330 |
 | CAT-III  | V-72065 | RHEL-07-021340 |
-| CAT-I    | V-72067 | RHEL-07-021350 |
+| CAT-I    | V-72067 | RHEL-07-021350 | mindpoint copies over a golden grub config
 | CAT-III  | V-72069 | RHEL-07-021600 |
 | CAT-III  | V-72071 | RHEL-07-021610 |
 | CAT-II   | V-72073 | RHEL-07-021620 |
 | CAT-II   | V-72075 | RHEL-07-021700 |
-| CAT-I    | V-72213 | RHEL-07-032000 |
-| CAT-II   | V-72219 | RHEL-07-040100 |
+| CAT-I    | V-72213 | RHEL-07-032000 | AV software (S2CD uses clamav)
+| CAT-II   | V-72219 | RHEL-07-040100 | Firewall rules
 | CAT II   | V-72081 | RHEL-07-030010 | can be changed to f1 for availability
-| CAT II   | V-72083 | RHEL-07-030300 |
-| CAT II   | V-72087 | RHEL-07-030320 |
-| CAT II   | V-72063 | RHEL-07-030321 |
-| CAT II   | V-72089 | RHEL-07-030330 |
-| CAT II   | V-72091 | RHEL-07-030340 |
-| CAT II   | V-72093 | RHEL-07-030350 |
+| CAT II   | V-72083 | RHEL-07-030300 | dont know logging solution
+| CAT II   | V-72089 | RHEL-07-030330 | dont know partition size

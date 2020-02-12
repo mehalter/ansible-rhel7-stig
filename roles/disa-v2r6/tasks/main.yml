@@ -1527,6 +1527,61 @@
         - RHEL-07-030201
         - RHEL-07-030210
 
+- name: "CAT-II | RHEL-07-030310 | The Red Hat Enterprise Linux operating system must encrypt the transfer of audit records off-loaded onto a different system or media from the system being audited."
+  block:
+    - name: "create /etc/audisp/audisp-remote.conf"
+      file:
+        dest: /etc/audisp/audisp-remote.conf
+        state: touch
+        owner: root
+        group: root
+        mode: 0600
+
+    - name: "set krb5 status"
+      lineinfile:
+        path: /etc/audisp/audisp-remote.conf
+        regexp: ^enable_krb5 +=
+        line: enable_krb5 = yes
+  tags:
+      - CAT-II
+      - RHEL-07-030310
+
+- name: "CAT-II | RHEL-07-030320 | The Red Hat Enterprise Linux operating system must be configured so that the audit system takes appropriate action when the audit storage volume is full."
+  lineinfile:
+      path: /etc/audisp/audisp-remote.conf
+      regexp: ^disk_full_action +=
+      line: "disk_full_action = single"
+  tags:
+      - CAT-II
+      - RHEL-07-030320
+
+- name: "CAT-II | RHEL-07-030321 | The Red Hat Enterprise Linux operating system must be configured so that the audit system takes appropriate action when there is an error sending audit records to a remote system."
+  lineinfile:
+      path: /etc/audisp/audisp-remote.conf
+      regexp: ^network_failure_action +=
+      line: "network_failure_action = syslog"
+  tags:
+      - CAT-II
+      - RHEL-07-030321
+
+- name: "CAT-II | RHEL-07-030340 | The Red Hat Enterprise Linux operating system must immediately notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) via email when the threshold for the repository maximum audit record storage capacity is reached."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: ^space_left_action +=
+      line: "space_left_action = email"
+  tags:
+      - CAT-II
+      - RHEL-07-030340
+
+- name: "CAT-II| RHEL-07-030350 | The Red Hat Enterprise Linux operating system must immediately notify the System Administrator (SA) and Information System Security Officer (ISSO) (at a minimum) when the threshold for the repository maximum audit record storage capacity is reached."
+  lineinfile:
+      path: /etc/audit/auditd.conf
+      regexp: ^action_mail_acct +=
+      line: "action_mail_acct = root"
+  tags:
+      - CAT-II
+      - RHEL-07-030350
+
 - name: "CAT II | RHEL-07-030360 | The Red Hat Enterprise Linux operating system must audit all executions of privileged functions."
   block:
     - name: "Create an Audit config file to house all the DISA STIG RULES"
