@@ -1291,8 +1291,8 @@
     - RHEL-07-020200
 
 - name: |
-  "CAT I | RHEL-07-020210 | The Red Hat Enterprise Linux operating system must enable SELinux."
-  "CAT I | RHEL-07-020220 | The Red Hat Enterprise Linux operating system must enable the SELinux targeted policy."
+    "CAT I | RHEL-07-020210 | The Red Hat Enterprise Linux operating system must enable SELinux."
+    "CAT I | RHEL-07-020220 | The Red Hat Enterprise Linux operating system must enable the SELinux targeted policy."
   block:
     - name: check if SELinux is enforcing
       selinux:
@@ -1349,3 +1349,545 @@
   tags:
     - CAT-II
     - RHEL-07-020610
+
+- name: "CAT II | RHEL-07-040170 | The Red Hat Enterprise Linux operating system must display the Standard Mandatory DoD Notice and Consent Banner immediately prior to, or as part of, remote access logon prompts."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?Banner"
+      line: Banner /etc/issue
+      validate: /usr/sbin/sshd -tf %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040170
+      - CAT-II 
+
+
+- name: "CAT II | RHEL-07-040201 | The Red Hat Enterprise Linux operating system must implement virtual address space randomization."
+  sysctl:
+      name: kernel.randomize_va_space
+      value: 2
+      state: present
+      reload: yes
+      sysctl_set: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040201
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040300 | The Red Hat Enterprise Linux operating system must be configured so that all networked systems have SSH installed."
+  yum:
+      name:
+          - openssh-server
+      state: present
+  tags:
+      - RHEL-07-040300
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040310 | The Red Hat Enterprise Linux operating system must be configured so that all networked systems use SSH for confidentiality and integrity of transmitted and received information as well as information during preparation for transmission."
+  service:
+      name: sshd
+      state: started
+      enabled: yes
+  tags:
+      - RHEL-07-040310
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040320 | The Red Hat Enterprise Linux operating system must be configured so that all network connections associated with SSH traffic are terminated at the end of the session or after 10 minutes of inactivity, except to fulfill documented and validated mission requirements."
+  lineinfile:
+      create: yes
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?ClientAliveInterval"
+      line: ClientAliveInterval 600
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040320
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040330 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon does not allow authentication using RSA rhosts authentication."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?RhostsRSAAuthentication"
+      line: RhostsRSAAuthentication no
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040330
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040340 | The Red Hat Enterprise Linux operating system must be configured so that all network connections associated with SSH traffic terminate after a period of inactivity."
+  lineinfile:
+      create: yes
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?ClientAliveCountMax"
+      line: ClientAliveCountMax 0
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040340
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040350 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon does not allow authentication using rhosts authentication."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?IgnoreRhosts"
+      line: IgnoreRhosts yes
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040350
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040360 | The Red Hat Enterprise Linux operating system must display the date and time of the last successful account logon upon an SSH logon."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?PrintLastLog"
+      line: PrintLastLog yes
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040360
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040370 | The Red Hat Enterprise Linux operating system must not permit direct logons to the root account using remote access via SSH."
+  lineinfile:
+      create: yes
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?PermitRootLogin"
+      line: PermitRootLogin no
+      insertafter: '(?i)^#?authentication'
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040370
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040380 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon does not allow authentication using known hosts authentication."
+  lineinfile:
+      create: yes
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?IgnoreUserKnownHosts"
+      line: IgnoreUserKnownHosts yes
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040380
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040400 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon is configured to only use Message Authentication Codes (MACs) employing FIPS 140-2 approved cryptographic hash algorithms."
+  lineinfile:
+      create: yes
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?MACs"
+      line: MACs hmac-sha2-256,hmac-sha2-512
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - CAT-II 
+      - RHEL-07-040400
+
+- name: "CAT II | RHEL-07-040410 | The Red Hat Enterprise Linux operating system must be configured so that the SSH public host key files have mode 0644 or less permissive."
+  block:
+      - name: "CAT II | RHEL-07-040410 | AUDIT | The Red Hat Enterprise Linux operating system must be configured so that the SSH public host key files have mode 0644 or less permissive."
+        find:
+            paths: /etc/ssh
+            recurse: yes
+            file_type: file
+            patterns: 'ssh_host*_key.pub'
+            hidden: true
+        failed_when: no
+        changed_when: no
+        register: rhel_07_040410_audit
+
+      - name: "CAT II | RHEL-07-040410 | The Red Hat Enterprise Linux operating system must be configured so that the SSH public host key files have mode 0644 or less permissive."
+        file:
+            dest: "{{ item.path }}"
+            mode: 0644
+            state: file
+        with_items: "{{ rhel_07_040410_audit.files | default([]) }}"
+  tags:
+      - RHEL-07-040410
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040420 | The Red Hat Enterprise Linux operating system must be configured so that the SSH private host key files have mode 0640 or less permissive."
+  block:
+      - name: "CAT II | RHEL-07-040420 | AUDIT | The Red Hat Enterprise Linux operating system must be configured so that the SSH private host key files have mode 0640 or less permissive."
+        find:
+            paths: /etc/ssh
+            recurse: yes
+            file_type: file
+            patterns: 'ssh_host*_key'
+            hidden: true
+        failed_when: no
+        changed_when: no
+        register: rhel_07_040420_audit
+
+      - name: "CAT II | RHEL-07-040420 | The Red Hat Enterprise Linux operating system must be configured so that the SSH private host key files have mode 0640 or less permissive."
+        file:
+            dest: "{{ item.path }}"
+            mode: 0640
+            state: file
+        with_items: "{{ rhel_07_040420_audit.files | default([]) }}"
+  tags:
+      - RHEL-07-040420
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040430 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon does not permit Generic Security Service Application Program Interface (GSSAPI) authentication unless needed."
+  lineinfile:
+      create: yes
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?GSSAPIAuthentication"
+      line: GSSAPIAuthentication no
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040430
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040440 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon does not permit Kerberos authentication unless needed."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?KerberosAuthentication"
+      line: KerberosAuthentication no
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040440
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040450 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon performs strict mode checking of home directory configuration files."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?StrictModes"
+      line: StrictModes yes
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040450
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040460 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon uses privilege separation."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?UsePrivilegeSeparation"
+      line: UsePrivilegeSeparation sandbox
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040460
+      - CAT-II 
+
+- name: "CAT II | RHEL-07-040470 | The Red Hat Enterprise Linux operating system must be configured so that the SSH daemon does not allow compression or only allows compression after successful authentication."
+  lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?Compression"
+      line: Compression no
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040470
+      - CAT-II 
+
+- name: "CAT II	| RHEL-07-040520 | The Red Hat Enterprise Linux operating system must enable an application firewall, if available."
+  block:
+    - name: "Make sure firewalld is installed"
+      yum:
+        name: firewalld
+        state: present
+    
+    - name: "Make sure firewall is running and enabled"
+      service:
+        name: firewalld
+        enabled: yes
+        state: started
+  tags:
+    - CAT II	
+    - RHEL-07-040520
+
+- name: "CAT III | RHEL-07-040530 | The Red Hat Enterprise Linux operating system must display the date and time of the last successful account logon upon logon."
+  block:
+      - name: "make sure lastlog.so is there"
+        pamd:
+            name: postlogin
+            type: session
+            control: required
+            module_path: pam_lastlog.so
+            state: updated
+      - name: "make sure lastlog.so is there"
+        pamd:
+            name: postlogin
+            type: session
+            control: required
+            module_path: pam_lastlog.so
+            module_arguments: showfailed
+            state: args_present
+         
+      - name: "correct the arguements"
+        pamd:
+            name: postlogin
+            state: args_absent
+            type: session
+            control: "{{ item }}"
+            module_path: pam_lastlog.so
+            module_arguments: silent
+        with_items:
+            - '[default=1]'
+            - 'optional'
+            - '[success=1 default=ignore]'
+            - 'required'
+            - 'sufficient'
+  tags:
+    - CAT-I
+    - RHEL-07-040530
+
+- name: "CAT I | RHEL-07-040540 | The Red Hat Enterprise Linux operating system must not contain .shosts files."
+  block:
+      - name: "find all .shosts"
+        command: find / -xdev -name '.shosts'
+        check_mode: no
+        changed_when: no
+        register: rhel_07_040540_audit
+
+      - name: "remove all .shost"
+        file:
+            path: "{{ item }}"
+            state: absent
+        with_items: "{{ rhel_07_040540_audit.stdout_lines }}"
+  tags:
+      - RHEL-07-040540
+      - CAT-I
+
+- name: "CAT I | RHEL-07-040550 | The Red Hat Enterprise Linux operating system must not contain shosts.equiv files."
+  block:
+      - name: "find all shosts.equiv"
+        command: find / -xdev -name 'shosts.equiv'
+        check_mode: no
+        changed_when: no
+        register: rhel_07_040550_audit
+
+      - name: "remove all shosts.equiv"
+        file:
+            path: "{{ item }}"
+            state: absent
+        with_items: "{{ rhel_07_040550_audit.stdout_lines }}"
+  tags:
+      - RHEL-07-040550
+      - CAT-I
+
+- name: "CAT II | RHEL-07-040610 | The Red Hat Enterprise Linux operating system must not forward Internet Protocol version 4 (IPv4) source-routed packets."
+  sysctl:
+      name: net.ipv4.conf.all.accept_source_route
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040610
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040611 | The Red Hat Enterprise Linux operating system must use a reverse-path filter for IPv4 network traffic when possible on all interfaces."
+  sysctl:
+      name: net.ipv4.conf.all.rp_filter
+      state: present
+      value: '1'
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040611
+      - CAT-II
+    
+- name: "CAT II | RHEL-07-040612 | The Red Hat Enterprise Linux operating system must use a reverse-path filter for IPv4 network traffic when possible by default."
+  sysctl:
+      name: net.ipv4.conf.default.rp_filter
+      state: present
+      value: '1'
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040612
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040620 | The Red Hat Enterprise Linux operating system must not forward Internet Protocol version 4 (IPv4) source-routed packets by default."
+  sysctl:
+      name: net.ipv4.conf.default.accept_source_route
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040620
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040630 | The Red Hat Enterprise Linux operating system must not respond to Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) echoes sent to a broadcast address."
+  sysctl:
+      name: net.ipv4.icmp_echo_ignore_broadcasts
+      state: present
+      value: 1
+      sysctl_set: yes
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040630
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040640 | The Red Hat Enterprise Linux operating system must prevent Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) redirect messages from being accepted."
+  sysctl:
+      name: net.ipv4.conf.default.accept_redirects
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040640
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040641 | The Red Hat Enterprise Linux operating system must ignore Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) redirect messages"
+  sysctl:
+      name: net.ipv4.conf.all.accept_redirects
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040641
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040650 |  The Red Hat Enterprise Linux operating system must not allow interfaces to perform Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) redirects by default."
+  sysctl:
+      name: net.ipv4.conf.default.send_redirects
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040650
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040660 | The Red Hat Enterprise Linux operating system must not send Internet Protocol version 4 (IPv4) Internet Control Message Protocol (ICMP) redirects."
+  sysctl:
+      name: net.ipv4.conf.all.send_redirects
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040660
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040670 | Network interfaces configured on the Red Hat Enterprise Linux operating system must not be in promiscuous mode."
+  block:
+      - name: "register all nics for promiscuous mode"
+        shell: "ip link | grep -i promisc | cut -d ':' -f 2"
+        check_mode: no
+        failed_when: no
+        changed_when: rhel_07_040670_promisc_check.stdout != ''
+        ignore_errors: yes
+        register: rhel_07_040670_promisc_check
+
+      - name: "turn off promiscuous mode"
+        shell: "ip link set dev {{ item }} promisc off"
+        with_items: "{{ rhel_07_040670_promisc_check.stdout_lines }}"
+  tags:
+      - RHEL-07-040670
+      - CAT-II
+
+- name: "CAT II | RHEL-07-040680 | The Red Hat Enterprise Linux operating system must be configured to prevent unrestricted mail relaying."
+  block:
+      - name: "register if postfix is there"
+        command: rpm -q postfix
+        failed_when: no
+        check_mode: no
+        changed_when: no
+        register: rhel_07_040680_rpm_audit
+
+      - name: "register the settings"
+        command: "/usr/sbin/postconf -n smtpd_client_restrictions"
+        check_mode: no
+        changed_when: no
+        register: rhel_07_040680_postconf_audit
+        when: rhel_07_040680_rpm_audit.rc == 0
+
+      - name: "correct the settings if needed"
+        command: "/usr/sbin/postconf -e 'smtpd_client_restrictions=permit_mynetworks, reject'"
+        when:
+            - rhel_07_040680_rpm_audit.rc == 0
+            - rhel_07_040680_postconf_audit.stdout != 'smtpd_client_restrictions = permit_mynetworks, reject'
+  tags:
+      - RHEL-07-040680
+      - CAT-II
+
+- name: "CAT I | RHEL-07-040690 | The Red Hat Enterprise Linux operating system must not have a File Transfer Protocol (FTP) server package installed unless needed."
+  yum:
+      name: vsftpd
+      state: absent 
+  tags:
+      - RHEL-07-040690
+      - CAT-I
+
+- name: CAT I | RHEL-07-040700 | The Red Hat Enterprise Linux operating system must not have the Trivial File Transfer Protocol (TFTP) server package installed if not required for operational support."
+  yum:
+      name:
+          - tftp-server
+      state: absent
+  tags:
+      - RHEL-07-040700
+      - CAT-I
+
+- name: CAT I | RHEL-07-040710 | The Red Hat Enterprise Linux operating system must be configured so that remote X connections for interactive users are encrypted."
+  lineinfile:
+      create: yes
+      dest: /etc/ssh/sshd_config
+      regexp: "(?i)^#?X11Forwarding"
+      line: X11Forwarding yes
+      validate: /usr/sbin/sshd -t -f %s
+  notify: restart sshd
+  tags:
+      - RHEL-07-040710
+      - CAT-I
+
+- name: "CAT II | RHEL-07-040740 | The Red Hat Enterprise Linux operating system must not be performing packet forwarding unless the system is a router."
+  sysctl:
+      name: net.ipv4.ip_forward
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040740
+      - CAT-II
+
+- name: CAT I | RHEL-07-040800 | SNMP community strings on the Red Hat Enterprise Linux operating system must be changed from the default."
+  block:
+      - name: "compile a list of public and private in snmpd.conf"
+        command: grep {{ item }} /etc/snmp/snmpd.conf
+        check_mode: no
+        failed_when: no
+        changed_when: no
+        with_items:
+            - public
+            - private
+        register: rhel_07_040800_audit
+
+      - name: "replace public and private"
+        replace:
+            dest: /etc/snmp/snmpd.conf
+            regexp: (^com2sec.*default\s+)(public|private)
+            replace: Endgam3Ladyb0g
+        with_items: "{{ rhel_07_040800_audit.results }}"
+        notify: restart snmpd
+        when: item.stdout_lines | length > 0
+  tags:
+      - RHEL-07-040800
+      - CAT-I
+
+
+- name: "CAT II | RHEL-07-040830 | The Red Hat Enterprise Linux operating system must not forward IPv6 source-routed packets."
+  sysctl:
+      name: net.ipv6.conf.all.accept_source_route
+      state: present
+      value: 0
+      reload: yes
+      ignoreerrors: yes
+  tags:
+      - RHEL-07-040830
+      - CAT-II
