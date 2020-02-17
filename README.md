@@ -56,3 +56,17 @@ This is heavily based on the [MindPointGroup/RHEL7-STIG](https://github.com/Mind
 | CAT II   | V-72081 | RHEL-07-030010 | can be changed to f1 for availability
 | CAT II   | V-72083 | RHEL-07-030300 | dont know logging solution
 | CAT II   | V-72089 | RHEL-07-030330 | dont know partition size
+| CAT II   | V-72227 | RHEL-07-040180 |
+| CAT II   | V-72229 | RHEL-07-040190 |
+| CAT II   | V-72231 | RHEL-07-040200 |
+| CAT II   | V-72269 | RHEL-07-040500 | not sure if you are using chrony or ntp
+| CAT III  | V-72881 | RHEL-07-040600 | not sure what the dns solution is
+| CAT III  | V-72305 | RHEL-07-040720 |
+| CAT III  | V-72307 | RHEL-07-040730 |
+| CAT III  | V-72311 | RHEL-07-040750 |
+| CAT III  | V-72315 | RHEL-07-040810 |
+| CAT III  | V-72317 | RHEL-07-040820 |
+| CAT III  | V-72319 | RHEL-07-041001 |
+| CAT III  | V-72417 | RHEL-07-041002 |
+| CAT III  | V-72427 | RHEL-07-041003 |
+| CAT III  | V-72433 | RHEL-07-041010 |
