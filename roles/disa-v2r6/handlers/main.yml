@@ -6,6 +6,11 @@
   when:
     - ssh_present
 
+- name: restart snmpd
+  service:
+      name: snmpd
+      state: restarted
+
 - name: make grub2 config
   command: /usr/sbin/grub2-mkconfig --output=/boot/efi/EFI/redhat/grub.cfg
 

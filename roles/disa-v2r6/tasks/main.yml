@@ -1145,31 +1145,31 @@
     - CAT-II
     - RHEL-07-010481
 
-- name: "CAT I | RHEL-07-010491 | Red Hat Enterprise Linux operating systems version 7.2 or newer using Unified Extensible Firmware Interface (UEFI) must require authentication upon booting into single-user and maintenance modes."
-  block:
-    - name: verify bootloader authentication password
-      lineinfile:
-        path: /boot/efi/EFI/redhat/user.cfg
-        create: yes
-        regexp: ^GRUB2_PASSWORD=
-        line: GRUB2_PASSWORD={{ bootloader_password_hash }}
-      notify: make grub2 config
-    - name: verify superuser accounts for bootloader
-      lineinfile:
-        dest: /boot/efi/EFI/redhat/grub.cfg
-        create: yes
-        insertafter: EOF
-        regexp: "{{ item.regexp }}"
-        line: "{{ item.line }}"
-      notify: make grub2 config
-      with_items:
-        - regexp: ^\s*set superusers=
-          line: '    set superusers="root"'
-        - regexp: ^\s*export superusers
-          line: '    export superusers'
-  tags:
-    - CAT-I
-    - RHEL-07-010491
+#- name: "CAT I | RHEL-07-010491 | Red Hat Enterprise Linux operating systems version 7.2 or newer using Unified Extensible Firmware Interface (UEFI) must require authentication upon booting into single-user and maintenance modes."
+#  block:
+#    - name: verify bootloader authentication password
+#      lineinfile:
+#        path: /boot/efi/EFI/redhat/user.cfg
+#        create: yes
+#        regexp: ^GRUB2_PASSWORD=
+#        line: GRUB2_PASSWORD={{ bootloader_password_hash }}
+#      notify: make grub2 config
+#    - name: verify superuser accounts for bootloader
+#      lineinfile:
+#        dest: /boot/efi/EFI/redhat/grub.cfg
+#        create: yes
+#        insertafter: EOF
+#        regexp: "{{ item.regexp }}"
+#        line: "{{ item.line }}"
+#      notify: make grub2 config
+#      with_items:
+#        - regexp: ^\s*set superusers=
+#          line: '    set superusers="root"'
+#        - regexp: ^\s*export superusers
+#          line: '    export superusers'
+#  tags:
+#    - CAT-I
+#    - RHEL-07-010491
 
 - name: "CAT I | RHEL-07-020000 | The Red Hat Enterprise Linux operating system must not have the rsh-server package installed."
   block:
@@ -1191,56 +1191,43 @@
     - CAT-I
     - RHEL-07-020010
 
-#- name: "CAT II | RHEL-07-020020 | The Red Hat Enterprise Linux operating system must prevent non-privileged users from executing privileged functions to include disabling, circumventing, or altering implemented security safeguards/countermeasures."
+#### DON'T INSTALL ANY PACKAGES #####
+#- name: |
+#    "CAT II | RHEL-07-020030 | The Red Hat Enterprise Linux operating system must be configured so that a file integrity tool verifies the baseline operating system configuration at least weekly."
+#    "CAT II | RHEL-07-020040 | The Red Hat Enterprise Linux operating system must be configured so that designated personnel are notified if baseline configurations are changed in an unauthorized manner."
 #  block:
-#    - name: check authorized users
-#      command: "true"
-#      changed_when: no
-#      when: rhel_07_020020
-#      tags:
-#          - CAT-II
-#          - RHEL-07-020020
-#   Might need to be done manually
-
-- name: |
-    "CAT II | RHEL-07-020030 | The Red Hat Enterprise Linux operating system must be configured so that a file integrity tool verifies the baseline operating system configuration at least weekly."
-    "CAT II | RHEL-07-020040 | The Red Hat Enterprise Linux operating system must be configured so that designated personnel are notified if baseline configurations are changed in an unauthorized manner."
-  block:
-    - name: ensure aide installed
-      command: rpm -q aide
-      args:
-        warn: false
-      register: aide_installed
-      failed_when: aide_installed.rc == 1
-      changed_when: false
-
-    - name: ensure /etc/cron.daily/aide exists
-      stat:
-        path: /etc/cron.daily/aide
-      register: aide_cron_daily
-
-    - name: create  /etc/cron.daily/aide if it does not exist
-      file:
-        path: /etc/cron.daily/aide
-        state: touch
-        owner: root
-        group: root
-        mode: 0600
-        #create: yes
-      when: aide_cron_daily.stat.exists == false
-
-    - name: ensure /etc/cron.daily/aide is set correctly
-      lineinfile:
-        path: /etc/cron.daily/aide
-        line: '{{ item }}'
-      with_items:
-        - '#!/bin/bash'
-        - '/usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root'
-      when: aide_installed.rc == 0
-  tags:
-    - CAT-II
-    - RHEL-07-020030
-    - RHEL-07-020040
+#    - name: ensure aide installed
+#      command: rpm -q aide
+#      args:
+#        warn: false
+#      register: aide_installed
+#      failed_when: aide_installed.rc == 1
+#      changed_when: false
+#    - name: ensure /etc/cron.daily/aide exists
+#      stat:
+#        path: /etc/cron.daily/aide
+#      register: aide_cron_daily
+#    - name: create  /etc/cron.daily/aide if it does not exist
+#      file:
+#        path: /etc/cron.daily/aide
+#        state: touch
+#        owner: root
+#        group: root
+#        mode: 0600
+#        #create: yes
+#      when: aide_cron_daily.stat.exists == false
+#    - name: ensure /etc/cron.daily/aide is set correctly
+#      lineinfile:
+#        path: /etc/cron.daily/aide
+#        line: '{{ item }}'
+#      with_items:
+#        - '#!/bin/bash'
+#        - '/usr/sbin/aide --check | /bin/mail -s "$HOSTNAME - Daily aide integrity check run" root'
+#      when: aide_installed.rc == 0
+#  tags:
+#    - CAT-II
+#    - RHEL-07-020030
+#    - RHEL-07-020040
 
 - name: "CAT I | RHEL-07-020050 | The Red Hat Enterprise Linux operating system must prevent the installation of software, patches, service packs, device drivers, or operating system components from a repository without verification they have been digitally signed using a certificate that is issued by a Certificate Authority (CA) that is recognized and approved by the organization."
   block:
@@ -1469,6 +1456,7 @@
     - CAT-I
     - RHEL-07-021710
 
+#### DON'T INSTALL ANY PACKAGES #####
 # - name: "CAT I | RHEL-07-030000 | The Red Hat Enterprise Linux operating system must be configured so that auditing is configured to produce records containing information to establish what type of events occurred, where the events occurred, the source of the events, and the outcome of the events. These audit records must also identify individual identities of group account users."
 #   block:
 #     - name: "ensure auditd is present"
@@ -2067,27 +2055,27 @@
     - CAT-II
     - RHEL-07-030770
 
-- name: " CAT II | RHEL-07-030780 | The Red Hat Enterprise Linux operating system must audit all uses of the ssh-keysign command."
-  #  successful and unsuccessful attempts to use the ssh-keysign command
-  lineinfile:
-    path: /etc/audit/rules.d/DISA-STIGs.rules
-    line: '{{ item }}'
-  with_items:
-    -  '-a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F auid>=1000 -F auid!=4294967295 -k privileged-ssh'
-  tags:
-    - CAT-II
-    - RHEL-07-030780
-
-- name: " CAT II | RHEL-07-030800 | The Red Hat Enterprise Linux operating system must audit all uses of the crontab command."
-  #  successful and unsuccessful attempts to use the crontab command
-  lineinfile:
-    path: /etc/audit/rules.d/DISA-STIGs.rules
-    line: '{{ item }}'
-  with_items:
-    -  '-a always,exit -F path=/usr/bin/crontab -F auid>=1000 -F auid!=4294967295 -k privileged-cron'
-  tags:
-    - CAT-II
-    - RHEL-07-030800
+#- name: " CAT II | RHEL-07-030780 | The Red Hat Enterprise Linux operating system must audit all uses of the ssh-keysign command."
+#  #  successful and unsuccessful attempts to use the ssh-keysign command
+#  lineinfile:
+#    path: /etc/audit/rules.d/DISA-STIGs.rules
+#    line: '{{ item }}'
+#  with_items:
+#    -  '-a always,exit -F path=/usr/libexec/openssh/ssh-keysign -F auid>=1000 -F auid!=4294967295 -k privileged-ssh'
+#  tags:
+#    - CAT-II
+#    - RHEL-07-030780
+#
+#- name: " CAT II | RHEL-07-030800 | The Red Hat Enterprise Linux operating system must audit all uses of the crontab command."
+#  #  successful and unsuccessful attempts to use the crontab command
+#  lineinfile:
+#    path: /etc/audit/rules.d/DISA-STIGs.rules
+#    line: '{{ item }}'
+#  with_items:
+#    -  '-a always,exit -F path=/usr/bin/crontab -F auid>=1000 -F auid!=4294967295 -k privileged-cron'
+#  tags:
+#    - CAT-II
+#    - RHEL-07-030800
 
 - name: " CAT II | RHEL-07-030810 | The Red Hat Enterprise Linux operating system must audit all uses of the pam_timestamp_check command."
   #  successful and unsuccessful attempts to use the pam_timestamp_check command
@@ -2279,16 +2267,17 @@
   ##031000 and  RHEL-07-031010 pull from logging.yml may need to be manual depending on loggin solution
 
 
-- name: "CAT III| RHEL-07-040000 | The Red Hat Enterprise Linux operating system must limit the number of concurrent sessions to 10 for all accounts and/or account types."
-  lineinfile:
-    state: present
-    dest: /etc/security/limits.conf
-    insertbefore: '^# End of file'
-    regexp: '^\*.*maxlogins'
-    line: '*               hard    maxlogins       10'
-  tags:
-    - CAT-III
-    - RHEL-07-040000
+#### DISABLED #####
+# - name: "CAT III| RHEL-07-040000 | The Red Hat Enterprise Linux operating system must limit the number of concurrent sessions to 10 for all accounts and/or account types."
+#   lineinfile:
+#     state: present
+#     dest: /etc/security/limits.conf
+#     insertbefore: '^# End of file'
+#     regexp: '^\*.*maxlogins'
+#     line: '*               hard    maxlogins       10'
+#   tags:
+#     - CAT-III
+#     - RHEL-07-040000
 
 - name: "CAT II | RHEL-07-040110 | The Red Hat Enterprise Linux operating system must use a FIPS 140-2 approved cryptographic algorithm for SSH communications."
   lineinfile:
@@ -2498,7 +2487,7 @@
       - name: "CAT II | RHEL-07-040420 | The Red Hat Enterprise Linux operating system must be configured so that the SSH private host key files have mode 0640 or less permissive."
         file:
             dest: "{{ item.path }}"
-            mode: 0640
+            mode: 0600
             state: file
         with_items: "{{ rhel_07_040420_audit.files | default([]) }}"
   tags:
@@ -2763,30 +2752,28 @@
       - RHEL-07-040670
       - CAT-II
 
-- name: "CAT II | RHEL-07-040680 | The Red Hat Enterprise Linux operating system must be configured to prevent unrestricted mail relaying."
-  block:
-      - name: "register if postfix is there"
-        command: rpm -q postfix
-        failed_when: no
-        check_mode: no
-        changed_when: no
-        register: rhel_07_040680_rpm_audit
-
-      - name: "register the settings"
-        command: "/usr/sbin/postconf -n smtpd_client_restrictions"
-        check_mode: no
-        changed_when: no
-        register: rhel_07_040680_postconf_audit
-        when: rhel_07_040680_rpm_audit.rc == 0
-
-      - name: "correct the settings if needed"
-        command: "/usr/sbin/postconf -e 'smtpd_client_restrictions=permit_mynetworks, reject'"
-        when:
-            - rhel_07_040680_rpm_audit.rc == 0
-            - rhel_07_040680_postconf_audit.stdout != 'smtpd_client_restrictions = permit_mynetworks, reject'
-  tags:
-      - RHEL-07-040680
-      - CAT-II
+# - name: "CAT II | RHEL-07-040680 | The Red Hat Enterprise Linux operating system must be configured to prevent unrestricted mail relaying."
+#   block:
+#       - name: "register if postfix is there"
+#         command: rpm -q postfix
+#         failed_when: no
+#         check_mode: no
+#         changed_when: no
+#         register: rhel_07_040680_rpm_audit
+#       - name: "register the settings"
+#         command: "/usr/sbin/postconf -n smtpd_client_restrictions"
+#         check_mode: no
+#         changed_when: no
+#         register: rhel_07_040680_postconf_audit
+#         when: rhel_07_040680_rpm_audit.rc == 0
+#       - name: "correct the settings if needed"
+#         command: "/usr/sbin/postconf -e 'smtpd_client_restrictions=permit_mynetworks, reject'"
+#         when:
+#             - rhel_07_040680_rpm_audit.rc == 0
+#             - rhel_07_040680_postconf_audit.stdout != 'smtpd_client_restrictions = permit_mynetworks, reject'
+#   tags:
+#       - RHEL-07-040680
+#       - CAT-II
 
 - name: "CAT I | RHEL-07-040690 | The Red Hat Enterprise Linux operating system must not have a File Transfer Protocol (FTP) server package installed unless needed."
   yum:
